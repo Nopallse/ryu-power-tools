@@ -1,0 +1,62 @@
+.sidebar {
+  background: #001529;
+  position: relative;
+}
+
+.logoContainer {
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid #434343;
+}
+
+.logo {
+  color: #52c41a;
+  font-weight: 700;
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.menu {
+  margin-top: 16px;
+}
+
+.menu :global(.ant-menu-item-selected) {
+  background-color: #177ddc !important;
+  border-right: 3px solid #52c41a;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 16px;
+  border-top: 1px solid #434343;
+}
+
+.logoutBtn {
+  color: #ff7875;
+}
+
+.logoutBtn:hover {
+  color: #ff4d4f;
+}
+
+.collapseBtn {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collapseBtn:hover {
+  color: #52c41a;
+}

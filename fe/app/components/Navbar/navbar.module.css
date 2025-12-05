@@ -1,0 +1,278 @@
+.navbar {
+  width: 100%;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbarContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+}
+
+.logoImg {
+  height: 48px;
+  width: auto;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  font-size: 15px;
+  color: #1a1a1a;
+  flex: 1;
+}
+
+.antMenu {
+  flex: 1;
+  border-bottom: none !important;
+  background: transparent;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+}
+
+.antMenu :global(.ant-menu-item),
+.antMenu :global(.ant-menu-submenu-title) {
+  text-transform: uppercase;
+  color: #1d1b1b !important;
+  padding: 0 12px !important;
+  height: auto !important;
+  line-height: 1.5 !important;
+  border-bottom: none !important;
+}
+
+.antMenu :global(.ant-menu-item-selected) {
+  background-color: transparent !important;
+  color: #1d1b1b !important;
+  border-bottom: none !important;
+}
+
+.antMenu :global(.ant-menu-item::after) {
+  display: none !important;
+}
+
+.antMenu :global(.ant-menu-submenu-title::after) {
+  display: none !important;
+}
+
+.antMenu :global(.ant-menu-submenu > .ant-menu-submenu-title:hover) {
+  color: #1d1b1b !important;
+}
+
+.antMenu :global(.ant-menu-item:hover),
+.antMenu :global(.ant-menu-submenu-title:hover) {
+  color: #1d1b1b !important;
+}
+
+.antMenu :global(.ant-menu-submenu-popup) {
+  background: #ffffff !important;
+}
+
+.antMenu :global(.ant-menu-vertical .ant-menu-item),
+.antMenu :global(.ant-menu-vertical .ant-menu-submenu-title) {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+.antMenu :global(.ant-menu-submenu-arrow) {
+  color: #1d1b1b !important;
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search {
+  width: clamp(240px, 32vw, 520px);
+  border-radius: 999px;
+  padding-inline: 14px 18px;
+}
+
+.langSwitch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f5f5f5;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.flagBtn {
+  width: 36px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.flagBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: scale(1.05);
+}
+
+.flagBtnActive {
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.flagImg {
+  width: 24px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: #1d1b1b;
+  align-items: center;
+  justify-content: center;
+}
+
+.searchBtn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: #1d1b1b;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileSearch {
+  display: none;
+  padding: 12px 16px;
+  border-top: 1px solid #e8e8e8;
+  background: #ffffff;
+}
+
+.mobileSearchInput {
+  width: 100%;
+  border-radius: 999px;
+}
+
+.drawer :global(.ant-drawer-header) {
+  background: #2d6a2e;
+  color: #ffffff;
+  border-bottom: none;
+  padding: 16px 20px;
+}
+
+.drawer :global(.ant-drawer-body) {
+  padding: 0;
+}
+
+.drawer :global(.ant-drawer-content-wrapper) {
+  width: 240px !important;
+  max-width: 65vw !important;
+}
+
+.drawer :global(.ant-drawer-title) {
+  color: #ffffff !important;
+}
+
+.drawer :global(.ant-drawer-close) {
+  color: #ffffff !important;
+}
+
+.drawerMenu {
+  border-right: none !important;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.drawerMenu :global(.ant-menu-item),
+.drawerMenu :global(.ant-menu-submenu-title) {
+  padding-left: 20px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.drawerMenu :global(.ant-menu-item-selected) {
+  background-color: rgba(45, 106, 46, 0.1) !important;
+  color: #2d6a2e !important;
+}
+
+.drawerFooter {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e8e8e8;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 992px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .searchBtn {
+    display: flex;
+  }
+
+  .navbarContent {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .logo {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  .search {
+    display: none !important;
+  }
+
+  .actions {
+    gap: 8px;
+  }
+
+  .actions .langSwitch {
+    display: none;
+  }
+
+  .mobileSearch {
+    display: block;
+  }
+}
