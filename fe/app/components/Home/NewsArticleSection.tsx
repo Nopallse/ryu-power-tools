@@ -37,7 +37,7 @@ export default function NewsArticleSection() {
         {/* NEWS & ARTICLE */}
         <div className="mb-24">
           <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-primary underline decoration-2 underline-offset-4">
+            <h2 className="text-xl lg:text-2xl font-bold text-primary underline decoration-2 underline-offset-4">
               NEWS & ARTICLE
             </h2>
           </div>
@@ -54,7 +54,7 @@ export default function NewsArticleSection() {
                     />
                   </div>
                   <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-4 line-clamp-3 leading-tight group-hover:text-primary transition-colors">
+                    <h3 className="text-sm font-semibold text-gray-800 mb-4 line-clamp-3 leading-tight group-hover:text-primary transition-colors text-center">
                       {article.title}
                     </h3>
                     <div className="border-t border-gray-300 -mx-6 mt-auto pt-4 px-6">

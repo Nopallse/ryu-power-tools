@@ -29,23 +29,23 @@ const menuItems: MenuProps['items'] = [
         key: 'accessories',
         label: 'Accessories',
         children: [
-          { key: 'accessories-cable', label: 'Cable Connector' },
-          { key: 'accessories-abrasive', label: 'Abrasive' },
-          { key: 'accessories-blade', label: 'Circular Saw Blade' },
-          { key: 'accessories-wheel', label: 'Diamond Wheel' },
-          { key: 'accessories-drill', label: 'Drill Bits' },
-          { key: 'accessories-planner', label: 'Planner Blade' },
+          { key: 'accessories-cable', label: <Link href="/product-category/accessories/cable-connector">Cable Connector</Link> },
+          { key: 'accessories-abrasive', label: <Link href="/product-category/accessories/abrasive">Abrasive</Link> },
+          { key: 'accessories-blade', label: <Link href="/product-category/accessories/circular-saw-blade">Circular Saw Blade</Link> },
+          { key: 'accessories-wheel', label: <Link href="/product-category/accessories/diamond-wheel">Diamond Wheel</Link> },
+          { key: 'accessories-drill', label: <Link href="/product-category/accessories/drill-bits">Drill Bits</Link> },
+          { key: 'accessories-planner', label: <Link href="/product-category/accessories/planner-blade">Planner Blade</Link> },
         ],
       },
       {
         key: 'engine',
         label: 'Engine',
         children: [
-          { key: 'engine-chainsaw', label: 'Chain Saw' },
-          { key: 'engine-compressor', label: 'Compressor' },
-          { key: 'engine-gasoline', label: 'Gasoline Engine' },
-          { key: 'engine-generator', label: 'Generator' },
-          { key: 'engine-waterpump', label: 'Waterpump' },
+          { key: 'engine-chainsaw', label: <Link href="/product-category/engine/chain-saw">Chain Saw</Link> },
+          { key: 'engine-compressor', label: <Link href="/product-category/engine/compressor">Compressor</Link> },
+          { key: 'engine-gasoline', label: <Link href="/product-category/engine/gasoline-engine">Gasoline Engine</Link> },
+          { key: 'engine-generator', label: <Link href="/product-category/engine/generator">Generator</Link> },
+          { key: 'engine-waterpump', label: <Link href="/product-category/engine/waterpump">Waterpump</Link> },
         ],
       },
       {
@@ -56,46 +56,46 @@ const menuItems: MenuProps['items'] = [
             key: 'metal-working',
             label: 'Metal Working',
             children: [
-              { key: 'angle-grinder', label: 'Angle Grinder' },
-              { key: 'bench-drill', label: 'Bench Drill' },
-              { key: 'cut-off-saw', label: 'Cut Off saw' },
-              { key: 'die-grinders', label: 'Die Grinders' },
-              { key: 'drill', label: 'Drill' },
-              { key: 'impact-drill', label: 'Impact Drill' },
-              { key: 'magnetic-drill', label: 'Magnetic Drill' },
+              { key: 'angle-grinder', label: <Link href="/product-category/power-tools/angle-grinder">Angle Grinder</Link> },
+              { key: 'bench-drill', label: <Link href="/product-category/power-tools/bench-drill">Bench Drill</Link> },
+              { key: 'cut-off-saw', label: <Link href="/product-category/power-tools/cut-off-saw">Cut Off saw</Link> },
+              { key: 'die-grinders', label: <Link href="/product-category/power-tools/die-grinders">Die Grinders</Link> },
+              { key: 'drill', label: <Link href="/product-category/power-tools/drill">Drill</Link> },
+              { key: 'impact-drill', label: <Link href="/product-category/power-tools/impact-drill">Impact Drill</Link> },
+              { key: 'magnetic-drill', label: <Link href="/product-category/power-tools/magnetic-drill">Magnetic Drill</Link> },
             ],
           },
           {
             key: 'wood-working',
             label: 'Wood Working',
             children: [
-              { key: 'circular-saw', label: 'Circular Saw' },
-              { key: 'jig-saw', label: 'Jig Saw' },
-              { key: 'mitter-saw', label: 'Mitter Saw' },
-              { key: 'planner', label: 'Planner' },
-              { key: 'router', label: 'Router' },
-              { key: 'sander', label: 'Sander' },
-              { key: 'trimmer', label: 'Trimmer' },
-              { key: 'band-saw', label: 'Band Saw' },
+              { key: 'circular-saw', label: <Link href="/product-category/power-tools/circular-saw">Circular Saw</Link> },
+              { key: 'jig-saw', label: <Link href="/product-category/power-tools/jig-saw">Jig Saw</Link> },
+              { key: 'mitter-saw', label: <Link href="/product-category/power-tools/mitter-saw">Mitter Saw</Link> },
+              { key: 'planner', label: <Link href="/product-category/power-tools/planner">Planner</Link> },
+              { key: 'router', label: <Link href="/product-category/power-tools/router">Router</Link> },
+              { key: 'sander', label: <Link href="/product-category/power-tools/sander">Sander</Link> },
+              { key: 'trimmer', label: <Link href="/product-category/power-tools/trimmer">Trimmer</Link> },
+              { key: 'band-saw', label: <Link href="/product-category/power-tools/band-saw">Band Saw</Link> },
             ],
           },
           {
             key: 'general-working',
             label: 'General Working',
             children: [
-              { key: 'blower', label: 'Blower' },
-              { key: 'demolition-hammer', label: 'Demolition Hammer' },
-              { key: 'cordless', label: 'Cordless' },
-              { key: 'cordless-glue-gun', label: 'Cordless Glue Gun' },
-              { key: 'grass-trimmer', label: 'Grass Trimmer' },
-              { key: 'heat-gun', label: 'Heat Gun' },
-              { key: 'gun-polisher', label: 'Gun Polisher' },
-              { key: 'marble-cutter', label: 'Marble Cutter' },
-              { key: 'polisher', label: 'Polisher' },
-              { key: 'pressure-washer', label: 'Pressure Washer' },
-              { key: 'rotary-hammer', label: 'Rotary Hammer' },
-              { key: 'spray-gun', label: 'Spray Gun' },
-              { key: 'vacum-cleaner', label: 'Vacum Cleaner' },
+              { key: 'blower', label: <Link href="/product-category/power-tools/blower">Blower</Link> },
+              { key: 'demolition-hammer', label: <Link href="/product-category/power-tools/demolition-hammer">Demolition Hammer</Link> },
+              { key: 'cordless', label: <Link href="/product-category/power-tools/cordless">Cordless</Link> },
+              { key: 'cordless-glue-gun', label: <Link href="/product-category/power-tools/cordless-glue-gun">Cordless Glue Gun</Link> },
+              { key: 'grass-trimmer', label: <Link href="/product-category/power-tools/grass-trimmer">Grass Trimmer</Link> },
+              { key: 'heat-gun', label: <Link href="/product-category/power-tools/heat-gun">Heat Gun</Link> },
+              { key: 'gun-polisher', label: <Link href="/product-category/power-tools/gun-polisher">Gun Polisher</Link> },
+              { key: 'marble-cutter', label: <Link href="/product-category/power-tools/marble-cutter">Marble Cutter</Link> },
+              { key: 'polisher', label: <Link href="/product-category/power-tools/polisher">Polisher</Link> },
+              { key: 'pressure-washer', label: <Link href="/product-category/power-tools/pressure-washer">Pressure Washer</Link> },
+              { key: 'rotary-hammer', label: <Link href="/product-category/power-tools/rotary-hammer">Rotary Hammer</Link> },
+              { key: 'spray-gun', label: <Link href="/product-category/power-tools/spray-gun">Spray Gun</Link> },
+              { key: 'vacum-cleaner', label: <Link href="/product-category/power-tools/vacum-cleaner">Vacum Cleaner</Link> },
             ],
           },
         ],
@@ -103,13 +103,21 @@ const menuItems: MenuProps['items'] = [
       {
         key: 'welding',
         label: 'Welding',
-        children: [{ key: 'inverter', label: 'Inverter' }],
+        children: [{ key: 'inverter', label: <Link href="/product-category/welding/inverter">Inverter</Link> }],
       },
     ],
   },
   {
     key: 'catalog',
-    label: <Link href="/catalog">Download Catalog</Link>,
+    label: (
+      <a 
+        href="/catalog/ryu-catalog.pdf" 
+        target="_blank" 
+        rel="noopener noreferrer"
+      >
+        View Catalog
+      </a>
+    ),
   },
   {
     key: 'service-support',
@@ -119,11 +127,22 @@ const menuItems: MenuProps['items'] = [
       </span>
     ),
     children: [
-      { key: 'service-center', label: 'Service Center' },
-      { key: 'where-to-buy', label: 'Where To Buy' },
-      { key: 'altama-ecare', label: 'Altama E Care' },
-      { key: 'contact', label: 'Contact' },
-      { key: 'warranty', label: 'Warranty' },
+      { key: 'service-center', label: <Link href="/service-center">Service Center</Link> },
+      { key: 'where-to-buy', label: <Link href="/where-to-buy">Where To Buy</Link> },
+      { 
+        key: 'altama-ecare', 
+        label: (
+          <a 
+            href="https://play.google.com/store/apps/details?id=id.co.carepoint&pli=1" 
+            target="_blank" 
+            rel="noopener noreferrer"
+          >
+            Altama E Care
+          </a>
+        )
+      },
+      { key: 'contact', label: <Link href="/contact">Contact</Link> },
+      { key: 'warranty', label: <Link href="/warranty">Warranty</Link> },
     ],
   },
 ];
