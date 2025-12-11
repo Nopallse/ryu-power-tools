@@ -24,12 +24,9 @@ const RootLayout = ({ children }: React.PropsWithChildren) => (
     <body suppressHydrationWarning>
       <AntdRegistry>
         <ConfigProvider theme={theme}>
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
+          {children}
         </ConfigProvider>
       </AntdRegistry>
-      <ScrollToTop />
     </body>
   </html>
 );

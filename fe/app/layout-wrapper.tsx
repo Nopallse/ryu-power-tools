@@ -1,10 +1,13 @@
+'use client';
+
 import React from 'react';
 import { Layout } from 'antd';
 import Navbar from '@/app/components/Navbar';
+import Footer from '@/app/components/Footer';
 
-const { Content, Footer } = Layout;
+const { Content } = Layout;
 
-export default function LandingLayout({
+export default function LayoutWrapperComponent({
   children,
 }: {
   children: React.ReactNode;
@@ -18,7 +21,7 @@ export default function LandingLayout({
         </div>
       </Content>
       <Footer style={{ textAlign: 'center' }}>
-        © 2025 Ryu Power Tools. All rights reserved.
+        Ryu Power Tools © 2024. All Rights Reserved.
       </Footer>
     </Layout>
   );
