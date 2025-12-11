@@ -20,9 +20,7 @@ export default function LayoutWrapperComponent({
           {children}
         </div>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>
-        Ryu Power Tools © 2024. All Rights Reserved.
-      </Footer>
+      <Footer />
     </Layout>
   );
 }
