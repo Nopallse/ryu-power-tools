@@ -53,8 +53,8 @@ const marketplaces: Marketplace[] = [
 
 const WhereToBuyPage = () => {
   return (
-    <div className="bg-white py-16 sm:py-20 lg:py-24 px-6 sm:px-8 md:px-10">
-      <div className="max-w-6xl mx-auto text-center">
+    <div className="bg-white py-20">
+      <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16 text-center">
         <h1 className="text-2xl sm:text-3xl font-bold text-primary underline mb-4">
           Marketplace &amp; E-commerce Official Store
         </h1>

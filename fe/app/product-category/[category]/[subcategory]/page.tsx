@@ -97,7 +97,8 @@ const ProductCategoryPage: React.FC<ProductCategoryPageProps> = ({
   const subcategoryName = subcategoryNames[subcategory] || subcategory;
 
   return (
-    <div className="max-w-7xl mx-auto px-5 py-10 min-h-screen bg-white">
+    <div className="bg-white py-20">
+      <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
       <div className="text-center mb-12">
         <h1 className="text-5xl font-bold text-[#2d5016] mb-3">
           {subcategoryName}
@@ -110,45 +111,47 @@ const ProductCategoryPage: React.FC<ProductCategoryPageProps> = ({
       {products.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {products.map((product) => (
-            <div key={product.id} className="flex flex-col items-center">
-              <Card
-                hoverable
-                className="w-full border-none shadow-none bg-transparent hover:translate-y-[-8px] transition-all duration-300"
-                cover={
-                  <div className="w-full h-full border-none shadow-none flex items-center justify-center bg-white p-5">
-                    <Image
-                      alt={product.name}
-                      src={product.image}
-                      width={300}
-                      height={300}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        e.currentTarget.src = "/images/placeholder-product.jpg";
-                      }}
-                    />
-                  </div>
-                }
-              >
-                <Card.Meta
-                  title={
-                    <h3 className="text-xl font-semibold text-[#2d5016] my-5 text-center">
-                      {product.name}
-                    </h3>
-                  }
-                  description={
-                    <div className="flex flex-col items-center">
-                      <Button
-                        type="primary"
-                        block
-                        className="bg-[#e8e8e8] text-[#4a4a4a] border-none font-semibold h-[45px] rounded-none text-sm tracking-wide uppercase hover:bg-[#2d5016] hover:text-white"
-                      >
-                        READ MORE
-                      </Button>
+            <Link href={`/product/${product.id}`} key={product.id}>
+              <div className="flex flex-col items-center">
+                <Card
+                  hoverable
+                  className="w-full border-none shadow-none bg-transparent hover:translate-y-[-8px] transition-all duration-300"
+                  cover={
+                    <div className="w-full h-full border-none shadow-none flex items-center justify-center bg-white p-5">
+                      <Image
+                        alt={product.name}
+                        src={product.image}
+                        width={300}
+                        height={300}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = "/images/placeholder-product.jpg";
+                        }}
+                      />
                     </div>
                   }
-                />
-              </Card>
-            </div>
+                >
+                  <Card.Meta
+                    title={
+                      <h3 className="text-xl font-semibold text-[#2d5016] my-5 text-center">
+                        {product.name}
+                      </h3>
+                    }
+                    description={
+                      <div className="flex flex-col items-center">
+                        <Button
+                          type="primary"
+                          block
+                          className="bg-[#e8e8e8] text-[#4a4a4a] border-none font-semibold h-[45px] rounded-none text-sm tracking-wide uppercase hover:bg-[#2d5016] hover:text-white"
+                        >
+                          READ MORE
+                        </Button>
+                      </div>
+                    }
+                  />
+                </Card>
+              </div>
+            </Link>
           ))}
         </div>
       ) : (
@@ -164,6 +167,7 @@ const ProductCategoryPage: React.FC<ProductCategoryPageProps> = ({
           </Link>
         </div>
       )}
+      </div>
     </div>
   );
 };

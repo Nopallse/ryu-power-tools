@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Input, Space, Menu, Drawer, Button } from 'antd';
 import { SearchOutlined, MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import styles from './navbar.module.css';
 
 const menuItems: MenuProps['items'] = [
   {
@@ -167,61 +166,76 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <header className={styles.navbar}>
-      <div className={styles.navbarContent}>
-        <button className={styles.hamburger} onClick={toggleDrawer} aria-label="Menu">
+    <header className="w-full bg-white shadow-md sticky top-0 z-[100]">
+      <div className="flex items-center justify-between gap-6 py-3 px-4 sm:px-8 max-w-[1400px] mx-auto">
+        {/* Hamburger Menu - Mobile */}
+        <button 
+          className="lg:hidden flex items-center justify-center bg-transparent border-none cursor-pointer p-2 text-[#1d1b1b]" 
+          onClick={toggleDrawer} 
+          aria-label="Menu"
+        >
           <MenuOutlined style={{ fontSize: '24px' }} />
         </button>
 
-        <Link href="/" className={styles.logo}>
+        {/* Logo */}
+        <Link href="/" className="inline-flex items-center h-10 flex-1 lg:flex-none justify-center lg:justify-start">
           <Image
             src="/logo.jpg"
             alt="Ryu Power Tools"
-            width={140}
-            height={48}
+            width={120}
+            height={40}
             priority
-            className={styles.logoImg}
+            className="h-10 w-auto"
           />
         </Link>
 
-        <nav className={styles.navLinks}>
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center uppercase tracking-tight font-bold text-[12px] xl:text-[13px] text-[#1a1a1a] flex-1">
           <Menu
             mode="horizontal"
             items={menuItems}
-            className={styles.antMenu}
             defaultSelectedKeys={['home']}
+            className="flex-1 border-b-0 bg-transparent font-bold text-[12px] xl:text-[13px] tracking-tight [&_.ant-menu-item]:uppercase [&_.ant-menu-submenu-title]:uppercase [&_.ant-menu-item]:text-[#1d1b1b] [&_.ant-menu-submenu-title]:text-[#1d1b1b] [&_.ant-menu-item]:px-1.5 [&_.ant-menu-submenu-title]:px-1.5 [&_.ant-menu-item]:h-auto [&_.ant-menu-submenu-title]:h-auto [&_.ant-menu-item]:leading-normal [&_.ant-menu-submenu-title]:leading-normal [&_.ant-menu-item]:border-b-0 [&_.ant-menu-item-selected]:bg-transparent [&_.ant-menu-item-selected]:text-[#1d1b1b] [&_.ant-menu-item-selected]:border-b-0 [&_.ant-menu-item::after]:hidden [&_.ant-menu-submenu-title::after]:hidden [&_.ant-menu-submenu>.ant-menu-submenu-title:hover]:text-[#1d1b1b] [&_.ant-menu-item:hover]:text-[#1d1b1b] [&_.ant-menu-submenu-title:hover]:text-[#1d1b1b] [&_.ant-menu-submenu-popup]:bg-white [&_.ant-menu-vertical_.ant-menu-item]:pl-3 [&_.ant-menu-vertical_.ant-menu-submenu-title]:pl-3 [&_.ant-menu-submenu-arrow]:text-[#1d1b1b]"
           />
         </nav>
 
-        <Space size={16} className={styles.actions}>
-          <button className={styles.searchBtn} onClick={toggleSearch} aria-label="Search">
+        {/* Actions */}
+        <Space size={16} className="inline-flex items-center gap-3">
+          {/* Search Button - Mobile */}
+          <button 
+            className="lg:hidden flex items-center justify-center bg-transparent border-none cursor-pointer p-2 text-[#1d1b1b]" 
+            onClick={toggleSearch} 
+            aria-label="Search"
+          >
             <SearchOutlined style={{ fontSize: '20px' }} />
           </button>
           
+          {/* Search Input - Desktop */}
           <Input
             size="large"
             allowClear
             prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
             placeholder="Search Model, Product, etc"
-            className={styles.search}
+            className="hidden lg:block w-[240px] xl:w-[520px] rounded-full px-3.5"
           />
           
-          <div className={styles.langSwitch}>
+          {/* Language Switch */}
+          <div className="hidden lg:inline-flex items-center gap-1.5 bg-[#f5f5f5] p-1 rounded-lg">
             <button 
               type="button" 
-              className={`${styles.flagBtn} ${language === 'en' ? styles.flagBtnActive : ''}`}
+              className={`w-9 h-8 rounded-md border-none bg-transparent cursor-pointer inline-flex items-center justify-center text-xl transition-all duration-200 hover:bg-black/5 hover:scale-105 ${language === 'en' ? 'bg-white shadow-md' : ''}`}
               onClick={() => switchLanguage('en')}
               aria-label="English"
             >
-              <img src="/images/flags/uk.png" alt="English" className={styles.flagImg} />
+              <img src="/images/flags/uk.png" alt="English" className="w-6 h-4 object-cover rounded-sm" />
             </button>
             <button 
               type="button" 
-              className={`${styles.flagBtn} ${language === 'id' ? styles.flagBtnActive : ''}`}
+              className={`w-9 h-8 rounded-md border-none bg-transparent cursor-pointer inline-flex items-center justify-center text-xl transition-all duration-200 hover:bg-black/5 hover:scale-105 ${language === 'id' ? 'bg-white shadow-md' : ''}`}
               onClick={() => switchLanguage('id')}
               aria-label="Bahasa Indonesia"
             >
-              <img src="/images/flags/indonesia.png" alt="Indonesia" className={styles.flagImg} />
+              <img src="/images/flags/indonesia.png" alt="Indonesia" className="w-6 h-4 object-cover rounded-sm" />
             </button>
           </div>
         </Space>
@@ -229,14 +243,14 @@ const Navbar: React.FC = () => {
 
       {/* Mobile Search Bar */}
       {searchVisible && (
-        <div className={styles.mobileSearch}>
+        <div className="lg:hidden block p-3 border-t border-[#e8e8e8] bg-white">
           <Input
             size="large"
             allowClear
             autoFocus
             prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
             placeholder="Search Model, Product, etc"
-            className={styles.mobileSearchInput}
+            className="w-full rounded-full"
           />
         </div>
       )}
@@ -251,39 +265,48 @@ const Navbar: React.FC = () => {
         placement="left"
         onClose={toggleDrawer}
         open={drawerVisible}
-        className={styles.drawer}
         size={240}
         styles={{
           wrapper: {
             width: '240px',
             maxWidth: '65vw'
+          },
+          header: {
+            background: '#2d6a2e',
+            color: '#ffffff',
+            borderBottom: 'none',
+            padding: '16px 20px'
+          },
+          body: {
+            padding: 0
           }
         }}
+        closeIcon={<CloseOutlined style={{ color: '#ffffff' }} />}
       >
         <Menu
           mode="inline"
           items={menuItems}
-          className={styles.drawerMenu}
           defaultSelectedKeys={['home']}
           onClick={toggleDrawer}
+          className="border-r-0 font-semibold text-sm [&_.ant-menu-item]:pl-5 [&_.ant-menu-submenu-title]:pl-5 [&_.ant-menu-item]:uppercase [&_.ant-menu-submenu-title]:uppercase [&_.ant-menu-item]:tracking-wide [&_.ant-menu-submenu-title]:tracking-wide [&_.ant-menu-item-selected]:bg-[#2d6a2e]/10 [&_.ant-menu-item-selected]:text-[#2d6a2e]"
         />
-        <div className={styles.drawerFooter}>
-          <div className={styles.langSwitch}>
+        <div className="absolute bottom-5 left-5 right-5 pt-5 border-t border-[#e8e8e8] flex justify-center">
+          <div className="inline-flex items-center gap-1.5 bg-[#f5f5f5] p-1 rounded-lg">
             <button 
               type="button" 
-              className={`${styles.flagBtn} ${language === 'en' ? styles.flagBtnActive : ''}`}
+              className={`w-9 h-8 rounded-md border-none bg-transparent cursor-pointer inline-flex items-center justify-center text-xl transition-all duration-200 hover:bg-black/5 hover:scale-105 ${language === 'en' ? 'bg-white shadow-md' : ''}`}
               onClick={() => switchLanguage('en')}
               aria-label="English"
             >
-              <img src="/images/flags/uk.png" alt="English" className={styles.flagImg} />
+              <img src="/images/flags/uk.png" alt="English" className="w-6 h-4 object-cover rounded-sm" />
             </button>
             <button 
               type="button" 
-              className={`${styles.flagBtn} ${language === 'id' ? styles.flagBtnActive : ''}`}
+              className={`w-9 h-8 rounded-md border-none bg-transparent cursor-pointer inline-flex items-center justify-center text-xl transition-all duration-200 hover:bg-black/5 hover:scale-105 ${language === 'id' ? 'bg-white shadow-md' : ''}`}
               onClick={() => switchLanguage('id')}
               aria-label="Bahasa Indonesia"
             >
-              <img src="/images/flags/indonesia.png" alt="Indonesia" className={styles.flagImg} />
+              <img src="/images/flags/indonesia.png" alt="Indonesia" className="w-6 h-4 object-cover rounded-sm" />
             </button>
           </div>
         </div>

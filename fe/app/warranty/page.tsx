@@ -202,8 +202,8 @@ const WarrantyPage = () => {
     },
   ];
   return (
-    <div className="bg-white py-16 sm:py-20 lg:py-24 px-6 sm:px-8 md:px-10">
-      <div className="max-w-5xl mx-auto">
+    <div className="bg-white py-20">
+      <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
         <h1 className="text-4xl sm:text-5xl font-bold text-[#2d5016] text-center underline mb-4">
           GENERAL WARRANTY INFORMATION
         </h1>

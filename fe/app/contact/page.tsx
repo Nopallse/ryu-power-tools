@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Input, Select, Button } from 'antd';
+import { Input, Select } from 'antd';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -38,89 +38,126 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="bg-white py-16 sm:py-20 lg:py-24 px-6 sm:px-8 md:px-10">
-      <div className="max-w-4xl mx-auto">
+    <div className="bg-white py-20">
+      <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
         {/* General Contact Section */}
         <div className="mb-20">
-          <h1 className="text-4xl sm:text-5xl font-bold text-[#2d5016] text-center underline mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-primary text-center">
             CONTACT US
           </h1>
 
-          <div className="bg-gray-50 rounded-lg p-8 mb-8">
-            <p className="text-center text-gray-700 text-lg mb-6">
+          <div className="bg-white rounded-lg p-4 mb-8">
+            <p className="text-center text-[#324A6D] text-sm mb-6">
               For all inquiries, please feel free to reach out at:
             </p>
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 text-center">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'center', color: '#324A6D', fontSize: '0.875rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
               <a
                 href="https://api.whatsapp.com/send?phone=6287777000966"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#2d5016] hover:text-[#72bd5a] font-semibold transition-colors"
+                style={{ color: '#324A6D', fontWeight: '600', transition: 'color 0.3s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#72bd5a')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#324A6D')}
               >
                 Whatsapp Customer Care +6287 7770 00966
               </a>
+              <span>|</span>
               <a
                 href="tel:62216680180"
-                className="text-[#2d5016] hover:text-[#72bd5a] font-semibold transition-colors"
+                style={{ color: '#324A6D', fontWeight: '600', transition: 'color 0.3s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#72bd5a')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#324A6D')}
               >
                 Phone Number (021) 6680180
               </a>
+              </div>
             </div>
           </div>
 
-          <form onSubmit={handleGeneralSubmit} className="space-y-4">
-            <Select
-              value={generalForm.type}
-              onChange={(value) => setGeneralForm({ ...generalForm, type: value })}
-              size="large"
-              className="w-full"
-            >
-              <Option value="Customer Care">Customer Care</Option>
-              <Option value="Distributor">Distributor</Option>
-              <Option value="Reseller">Reseller</Option>
-            </Select>
+          <form onSubmit={handleGeneralSubmit} className="space-y-5 max-w-2xl mx-auto">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Contact Type
+              </label>
+              <Select
+                value={generalForm.type}
+                onChange={(value) => setGeneralForm({ ...generalForm, type: value })}
+                size="large"
+                className="w-full"
+              >
+                <Option value="Customer Care">Customer Care</Option>
+                <Option value="Distributor">Distributor</Option>
+                <Option value="Reseller">Reseller</Option>
+              </Select>
+            </div>
 
-            <Input
-              size="large"
-              placeholder="Name"
-              value={generalForm.name}
-              onChange={(e) => setGeneralForm({ ...generalForm, name: e.target.value })}
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Name *
+              </label>
+              <Input
+                size="large"
+                placeholder="Name"
+                value={generalForm.name}
+                onChange={(e) => setGeneralForm({ ...generalForm, name: e.target.value })}
+                required
+              />
+            </div>
 
-            <Input
-              size="large"
-              placeholder="Phone"
-              value={generalForm.phone}
-              onChange={(e) => setGeneralForm({ ...generalForm, phone: e.target.value })}
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone *
+              </label>
+              <Input
+                size="large"
+                placeholder="Phone"
+                value={generalForm.phone}
+                onChange={(e) => setGeneralForm({ ...generalForm, phone: e.target.value })}
+                required
+              />
+            </div>
 
-            <Input
-              size="large"
-              type="email"
-              placeholder="Email"
-              value={generalForm.email}
-              onChange={(e) => setGeneralForm({ ...generalForm, email: e.target.value })}
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email *
+              </label>
+              <Input
+                size="large"
+                type="email"
+                placeholder="Email"
+                value={generalForm.email}
+                onChange={(e) => setGeneralForm({ ...generalForm, email: e.target.value })}
+                required
+              />
+            </div>
 
-            <Input
-              size="large"
-              placeholder="City"
-              value={generalForm.city}
-              onChange={(e) => setGeneralForm({ ...generalForm, city: e.target.value })}
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                City *
+              </label>
+              <Input
+                size="large"
+                placeholder="City"
+                value={generalForm.city}
+                onChange={(e) => setGeneralForm({ ...generalForm, city: e.target.value })}
+                required
+              />
+            </div>
 
-            <TextArea
-              rows={4}
-              placeholder="Message"
-              value={generalForm.message}
-              onChange={(e) => setGeneralForm({ ...generalForm, message: e.target.value })}
-              required
-              className="resize-none"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Message *
+              </label>
+              <TextArea
+                rows={4}
+                placeholder="Message"
+                value={generalForm.message}
+                onChange={(e) => setGeneralForm({ ...generalForm, message: e.target.value })}
+                required
+                className="resize-none"
+              />
+            </div>
 
             <p className="text-sm text-gray-600">
               This site is protected by reCAPTCHA and the Google{' '}
@@ -147,7 +184,7 @@ const ContactPage = () => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="px-12 py-3 bg-[#2d5016] text-white font-semibold rounded hover:bg-[#72bd5a] transition-colors cursor-pointer"
+                className="px-8 sm:px-10 py-1 sm:py-1.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base font-semibold tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
               >
                 Send
               </button>
@@ -161,58 +198,88 @@ const ContactPage = () => {
             CONTACT US FOR EVENT
           </h1>
 
-          <form onSubmit={handleEventSubmit} className="space-y-4">
-            <Select
-              value={eventForm.type}
-              onChange={(value) => setEventForm({ ...eventForm, type: value })}
-              size="large"
-              className="w-full"
-            >
-              <Option value="OFFLINE">OFFLINE</Option>
-              <Option value="ONLINE">ONLINE</Option>
-            </Select>
+          <form onSubmit={handleEventSubmit} className="space-y-5 max-w-2xl mx-auto">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Event Type
+              </label>
+              <Select
+                value={eventForm.type}
+                onChange={(value) => setEventForm({ ...eventForm, type: value })}
+                size="large"
+                className="w-full"
+              >
+                <Option value="OFFLINE">OFFLINE</Option>
+                <Option value="ONLINE">ONLINE</Option>
+              </Select>
+            </div>
 
-            <Input
-              size="large"
-              placeholder="Name"
-              value={eventForm.name}
-              onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Name *
+              </label>
+              <Input
+                size="large"
+                placeholder="Name"
+                value={eventForm.name}
+                onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
+                required
+              />
+            </div>
 
-            <Input
-              size="large"
-              placeholder="Phone"
-              value={eventForm.phone}
-              onChange={(e) => setEventForm({ ...eventForm, phone: e.target.value })}
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone *
+              </label>
+              <Input
+                size="large"
+                placeholder="Phone"
+                value={eventForm.phone}
+                onChange={(e) => setEventForm({ ...eventForm, phone: e.target.value })}
+                required
+              />
+            </div>
 
-            <Input
-              size="large"
-              type="email"
-              placeholder="Email"
-              value={eventForm.email}
-              onChange={(e) => setEventForm({ ...eventForm, email: e.target.value })}
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email *
+              </label>
+              <Input
+                size="large"
+                type="email"
+                placeholder="Email"
+                value={eventForm.email}
+                onChange={(e) => setEventForm({ ...eventForm, email: e.target.value })}
+                required
+              />
+            </div>
 
-            <Input
-              size="large"
-              placeholder="City"
-              value={eventForm.city}
-              onChange={(e) => setEventForm({ ...eventForm, city: e.target.value })}
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                City *
+              </label>
+              <Input
+                size="large"
+                placeholder="City"
+                value={eventForm.city}
+                onChange={(e) => setEventForm({ ...eventForm, city: e.target.value })}
+                required
+              />
+            </div>
 
-            <TextArea
-              rows={4}
-              placeholder="Message"
-              value={eventForm.message}
-              onChange={(e) => setEventForm({ ...eventForm, message: e.target.value })}
-              required
-              className="resize-none"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Message *
+              </label>
+              <TextArea
+                rows={4}
+                placeholder="Message"
+                value={eventForm.message}
+                onChange={(e) => setEventForm({ ...eventForm, message: e.target.value })}
+                required
+                className="resize-none"
+              />
+            </div>
 
             <p className="text-sm text-gray-600">
               This site is protected by reCAPTCHA and the Google{' '}
@@ -239,7 +306,7 @@ const ContactPage = () => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="px-12 py-3 bg-[#2d5016] text-white font-semibold rounded hover:bg-[#72bd5a] transition-colors cursor-pointer"
+                className="px-8 sm:px-10 py-1 sm:py-1.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base font-semibold tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
               >
                 Send
               </button>

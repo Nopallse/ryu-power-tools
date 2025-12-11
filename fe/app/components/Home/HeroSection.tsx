@@ -5,8 +5,8 @@ import { Button, Row, Col } from 'antd';
 
 export default function HeroSection() {
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-white flex items-center px-10 py-16">
-      <div className="max-w-[1400px] w-full mx-auto">
+    <div className="min-h-[calc(100vh-64px)] bg-white flex items-center py-24">
+      <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
         <Row gutter={[60, 60]} align="middle">
           <Col xs={24} lg={12}>
             <div className="pr-0 lg:pr-10">

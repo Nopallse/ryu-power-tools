@@ -36,8 +36,8 @@ const categories = [
 
 export default function AboutSection() {
   return (
-    <div className="py-24 px-10" style={{ background: 'linear-gradient(to top, #a3a3a3 0%, #ffffff 25%)' }}>
-      <div className="max-w-[1400px] mx-auto">
+    <div className="py-20" style={{ background: 'linear-gradient(to top, #a3a3a3 0%, #ffffff 25%)' }}>
+      <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
         <Row gutter={[80, 80]} align="middle">
           <Col xs={{ span: 24, order: 2 }} lg={{ span: 12, order: 1 }}>
             <Row gutter={[20, 20]}>

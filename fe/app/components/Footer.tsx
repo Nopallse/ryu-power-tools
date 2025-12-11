@@ -17,13 +17,12 @@ export default function Footer() {
   return (
     <footer className="bg-white">
       {/* Top Section */}
-        <div className="primary py-4 px-10 text-center">
-        <p className="font-semibold text-sm">© RYU POWER TOOLS 2025</p>
+        <div className="primary py-3 px-10 text-center">
       </div>
 
       {/* Main Content */}
-      <div className="px-10 py-16 border-b border-gray-200">
-        <div className="max-w-[1400px] mx-auto">
+      <div className="py-20 border-b border-gray-200">
+        <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
             {/* Logo */}
             <div className="md:col-span-1">

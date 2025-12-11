@@ -20,8 +20,8 @@ const anton = Anton({
 });
 
 const RootLayout = ({ children }: React.PropsWithChildren) => (
-  <html lang="en" className={`${poppins.variable} ${anton.variable}`}>
-    <body>
+  <html lang="en" className={`${poppins.variable} ${anton.variable}`} suppressHydrationWarning>
+    <body suppressHydrationWarning>
       <AntdRegistry>
         <ConfigProvider theme={theme}>
           <LayoutWrapper>

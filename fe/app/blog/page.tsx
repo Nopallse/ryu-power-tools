@@ -56,8 +56,8 @@ const articles = [
 
 export default function BlogPage() {
   return (
-    <div className="bg-white py-16 sm:py-20 lg:py-24 px-6 sm:px-8 md:px-10">
-      <div className="max-w-[1400px] mx-auto">
+    <div className="bg-white py-20">
+      <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
         <div className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl font-bold text-[#2d5016] underline mb-4">
             BLOG
@@ -69,7 +69,7 @@ export default function BlogPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {articles.map((article) => (
-            <Link href={`/articles/${article.id}`} key={article.id}>
+            <Link href={`/blog/${article.id}`} key={article.id}>
               <div className="flex flex-col h-full group cursor-pointer bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                 <div className="overflow-hidden">
                   <img 

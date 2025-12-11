@@ -186,8 +186,8 @@ const ServiceCenterPage: React.FC = () => {
   }));
 
   return (
-    <div className="bg-white py-16 sm:py-20 lg:py-24 px-6 sm:px-8 md:px-10">
-      <div className="max-w-[1400px] mx-auto">
+    <div className="bg-white py-20">
+      <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
       <div className="text-center mb-12">
         <h1 className="text-5xl font-bold text-[#2d5016] mb-3 underline">
           SERVICE CENTER
@@ -226,7 +226,7 @@ const ServiceCenterPage: React.FC = () => {
       <div className="mt-16 pt-8 border-t border-black flex ">
         <button
           type="button"
-          className="px-8 sm:px-10 py-3 sm:py-3.5 rounded-full border border-[#2d5016] bg-[#2d5016] text-white text-sm sm:text-base font-semibold tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
+          className="px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base  tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
         >
           CONTACT US
         </button>
