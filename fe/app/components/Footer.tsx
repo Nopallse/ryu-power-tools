@@ -27,7 +27,7 @@ export default function Footer() {
             {/* Logo */}
             <div className="md:col-span-1">
               <div className="w-32 h-20  rounded flex items-center justify-center">
-                <img src="/images/logo.jpg" alt="RYU Logo" className="w-full h-full object-contain" />
+                <img src="/images/logo.png" alt="RYU Logo" className="w-full h-full object-contain" />
               </div>
             </div>
 

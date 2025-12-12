@@ -175,7 +175,7 @@ const Navbar: React.FC = () => {
 
         <Link href="/" className={styles.logo}>
           <Image
-            src="/logo.jpg"
+            src="/images/logo.png"
             alt="Ryu Power Tools"
             width={140}
             height={48}
@@ -252,7 +252,7 @@ const Navbar: React.FC = () => {
         title={
           <div className={styles.drawerHeader}>
             <Image
-              src="/logo.jpg"
+              src="/images/logo.png"
               alt="Ryu Power Tools"
               width={100}
               height={36}
