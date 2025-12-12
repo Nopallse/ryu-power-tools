@@ -16,7 +16,7 @@ export default function LayoutWrapperComponent({
     <Layout>
       <Navbar />
       <Content className="landing-content">
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        <div style={{ margin: '0 auto' }}>
           {children}
         </div>
       </Content>

@@ -10,7 +10,7 @@ export default function AppLayout({
   return (
     <div>
       <Navbar />
-      <main className="landing-content" style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      <main className="landing-content" >
         {children}
       </main>
       <Footer />

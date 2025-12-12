@@ -51,7 +51,7 @@ export default function LatestSection() {
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {products.map((product) => (
-            <div key={product.id} className="flex flex-col items-center">
+            <div key={product.id} className="flex flex-col h-full items-center justify-between">
               <div className="bg-white border-2 border-[#2d6a2e] p-4 mb-4 flex items-center justify-center aspect-square w-full">
                 <img 
                   src={product.image} 
@@ -59,12 +59,12 @@ export default function LatestSection() {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <h3 className="text-center text-sm font-bold text-[#2d6a2e] mb-4 px-2 min-h-[3rem] flex items-center justify-center">
+              <h3 className="text-center text-sm font-bold text-[#2d6a2e] mb-4 px-2 min-h-[4.5rem] flex items-center justify-center flex-grow">
                 {product.title}
               </h3>
               <Button 
                 type="primary"
-                className="!bg-[#2d6a2e] hover:!bg-[#3d8a3e] !border-none !rounded !h-10 font-semibold !px-6"
+                className="!bg-[#2d6a2e] hover:!bg-[#3d8a3e] !border-none !rounded !h-10 font-semibold !px-6 mt-auto"
               >
                 READ MORE
               </Button>
