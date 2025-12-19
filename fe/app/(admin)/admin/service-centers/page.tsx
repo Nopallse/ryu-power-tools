@@ -1,18 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   Button,
   Space,
   Input,
-  Tag,
   Modal,
   Form,
-  message,
   Popconfirm,
   Card,
-  Select,
+  Spin,
 } from 'antd';
 import {
   PlusOutlined,
@@ -22,154 +20,194 @@ import {
   PhoneOutlined,
   EnvironmentOutlined,
   MailOutlined,
+  LoadingOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import { useAuthGuard } from '@/app/hooks/useAuthGuard';
+import {
+  getServiceCenters,
+  createServiceCenter,
+  updateServiceCenter,
+  deleteServiceCenter,
+  type ServiceCenter,
+} from '@/app/lib/service-center-api';
+import { App } from 'antd';
 
-const { Option } = Select;
 const { TextArea } = Input;
 
-interface ServiceCenter {
-  key: string;
-  id: string;
-  name: string;
-  city: string;
-  province: string;
-  address: string;
-  phone: string;
-  email: string;
-  status: 'active' | 'inactive';
-}
-
 const ServiceCentersPage = () => {
+  const { auth, ready } = useAuthGuard();
+  const { message } = App.useApp();
+
+  const [serviceCenters, setServiceCenters] = useState<ServiceCenter[]>([]);
+  const [filteredServiceCenters, setFilteredServiceCenters] = useState<ServiceCenter[]>([]);
+  const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
-  const serviceCenters: ServiceCenter[] = [
-    {
-      key: '1',
-      id: 'SC001',
-      name: 'Ryu Service Center Jakarta Pusat',
-      city: 'Jakarta',
-      province: 'DKI Jakarta',
-      address: 'Jl. Veteran No. 45, Jakarta Pusat',
-      phone: '021-3456789',
-      email: 'jakarta@ryuservice.com',
-      status: 'active',
-    },
-    {
-      key: '2',
-      id: 'SC002',
-      name: 'Ryu Service Center Surabaya',
-      city: 'Surabaya',
-      province: 'Jawa Timur',
-      address: 'Jl. Diponegoro No. 123, Surabaya',
-      phone: '031-7654321',
-      email: 'surabaya@ryuservice.com',
-      status: 'active',
-    },
-    {
-      key: '3',
-      id: 'SC003',
-      name: 'Ryu Service Center Bandung',
-      city: 'Bandung',
-      province: 'Jawa Barat',
-      address: 'Jl. Asia Afrika No. 88, Bandung',
-      phone: '022-8765432',
-      email: 'bandung@ryuservice.com',
-      status: 'active',
-    },
-  ];
+  useEffect(() => {
+    if (!ready || !auth) return;
+    loadServiceCenters();
+  }, [ready, auth]);
 
-  const provinces = [
-    'DKI Jakarta',
-    'Jawa Barat',
-    'Jawa Tengah',
-    'Jawa Timur',
-    'Banten',
-    'Sumatera Utara',
-    'Sumatera Selatan',
-    'Bali',
-  ];
+  useEffect(() => {
+    const filtered = serviceCenters.filter((sc) =>
+      sc.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      sc.address.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredServiceCenters(filtered);
+  }, [searchText, serviceCenters]);
+
+  const loadServiceCenters = async () => {
+    setLoading(true);
+    try {
+      const data = await getServiceCenters(auth!.token);
+      const list = Array.isArray(data) ? data : [];
+      setServiceCenters(list);
+      setFilteredServiceCenters(list);
+    } catch (error) {
+      message.error('Failed to load service centers');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const showModal = (serviceCenter?: ServiceCenter) => {
+    if (serviceCenter) {
+      setEditingId(serviceCenter.id);
+      form.setFieldsValue({
+        name: serviceCenter.name,
+        address: serviceCenter.address,
+        phone: serviceCenter.phone,
+        email: serviceCenter.email,
+      });
+    } else {
+      setEditingId(null);
+      form.resetFields();
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    form.resetFields();
+  };
+
+  const handleOk = async () => {
+    try {
+      if (!auth || !auth.token) {
+        message.error('Not authenticated');
+        return;
+      }
+
+      const values = await form.validateFields();
+      setSubmitting(true);
+
+      if (editingId) {
+        await updateServiceCenter(editingId, values, auth.token);
+        message.success('Service center updated successfully');
+      } else {
+        await createServiceCenter(values, auth.token);
+        message.success('Service center created successfully');
+      }
+
+      setIsModalOpen(false);
+      setEditingId(null);
+      form.resetFields();
+      loadServiceCenters();
+    } catch (error) {
+      message.error(editingId ? 'Failed to update service center' : 'Failed to create service center');
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteServiceCenter(id, auth!.token);
+      message.success('Service center deleted successfully');
+      loadServiceCenters();
+    } catch (error) {
+      message.error('Failed to delete service center');
+      console.error(error);
+    }
+  };
 
   const columns: ColumnsType<ServiceCenter> = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: 80,
-    },
-    {
-      title: 'Service Center Name',
+      title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      filteredValue: [searchText],
-      onFilter: (value, record) =>
-        record.name.toLowerCase().includes(value.toString().toLowerCase()) ||
-        record.city.toLowerCase().includes(value.toString().toLowerCase()),
-      render: (text, record) => (
-        <div>
-          <div className="font-medium">{text}</div>
-          <div className="text-sm text-gray-500">
-            <EnvironmentOutlined className="mr-1" />
-            {record.city}, {record.province}
-          </div>
+      render: (text: string) => (
+        <div className="flex items-center gap-2">
+          <EnvironmentOutlined className="text-blue-500" />
+          <span className="font-medium">{text}</span>
         </div>
       ),
     },
     {
-      title: 'Contact',
-      key: 'contact',
-      render: (_, record) => (
-        <div className="text-sm">
-          <div>
-            <PhoneOutlined className="mr-1" />
-            {record.phone}
-          </div>
-          <div className="text-gray-500">
-            <MailOutlined className="mr-1" />
-            {record.email}
-          </div>
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address',
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'phone',
+      key: 'phone',
+      width: 150,
+      render: (phone: string) => (
+        <div className="flex items-center gap-2">
+          <PhoneOutlined />
+          <span>{phone}</span>
         </div>
       ),
     },
     {
-      title: 'Province',
-      dataIndex: 'province',
-      key: 'province',
-      filters: provinces.map(p => ({ text: p, value: p })),
-      onFilter: (value, record) => record.province === value,
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => (
-        <Tag color={status === 'active' ? 'success' : 'default'}>
-          {status.toUpperCase()}
-        </Tag>
-      ),
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      width: 200,
+      render: (email: string) => email ? (
+        <div className="flex items-center gap-2">
+          <MailOutlined />
+          <span>{email}</span>
+        </div>
+      ) : '-',
     },
     {
       title: 'Action',
       key: 'action',
       fixed: 'right',
       width: 120,
-      render: () => (
+      render: (_, record) => (
         <Space size="small">
-          <Button type="text" icon={<EditOutlined />} size="small" onClick={() => setIsModalOpen(true)} />
+          <Button
+            type="primary"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => showModal(record)}
+          />
           <Popconfirm
             title="Delete Service Center"
             description="Are you sure you want to delete this service center?"
+            onConfirm={() => handleDelete(record.id)}
             okText="Yes"
             cancelText="No"
           >
-            <Button type="text" danger icon={<DeleteOutlined />} size="small" />
+            <Button type="primary" danger size="small" icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
       ),
     },
   ];
+
+  if (!ready) return null;
 
   return (
     <div>
@@ -182,48 +220,45 @@ const ServiceCentersPage = () => {
           type="primary"
           icon={<PlusOutlined />}
           size="large"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => showModal()}
           className="bg-green-600 hover:bg-green-700"
         >
           Add Service Center
         </Button>
       </div>
 
-      <Card bordered={false} className="shadow-sm">
+      <Card variant="borderless" className="shadow-sm">
         <div className="mb-4">
           <Input
-            placeholder="Search by name or city..."
+            placeholder="Search service centers..."
             prefix={<SearchOutlined />}
             size="large"
+            value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             className="max-w-md"
           />
         </div>
 
-        <Table
-          columns={columns}
-          dataSource={serviceCenters}
-          pagination={{
-            pageSize: 10,
-            showTotal: (total) => `Total ${total} service centers`,
-          }}
-        />
+        <Spin spinning={loading} indicator={<LoadingOutlined style={{ fontSize: 24 }} />}>
+          <Table
+            columns={columns}
+            dataSource={Array.isArray(filteredServiceCenters) ? filteredServiceCenters : []}
+            rowKey="id"
+            pagination={{
+              pageSize: 10,
+              showTotal: (total) => `Total ${total} service centers`,
+            }}
+            scroll={{ x: 1000 }}
+          />
+        </Spin>
       </Card>
 
       <Modal
-        title="Add New Service Center"
+        title={editingId ? 'Edit Service Center' : 'Add Service Center'}
         open={isModalOpen}
-        onOk={() => {
-          form.validateFields().then(() => {
-            message.success('Service center created successfully');
-            setIsModalOpen(false);
-            form.resetFields();
-          });
-        }}
-        onCancel={() => {
-          setIsModalOpen(false);
-          form.resetFields();
-        }}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        confirmLoading={submitting}
         width={700}
         okButtonProps={{ className: 'bg-green-600' }}
       >
@@ -233,37 +268,19 @@ const ServiceCentersPage = () => {
             label="Service Center Name"
             rules={[{ required: true, message: 'Please enter service center name' }]}
           >
-            <Input placeholder="e.g., Ryu Service Center Jakarta" size="large" />
+            <Input placeholder="e.g., RYU Service Center Jakarta" size="large" />
           </Form.Item>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item
-              name="province"
-              label="Province"
-              rules={[{ required: true, message: 'Please select province' }]}
-            >
-              <Select placeholder="Select province" size="large">
-                {provinces.map(p => (
-                  <Option key={p} value={p}>{p}</Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="city"
-              label="City"
-              rules={[{ required: true, message: 'Please enter city' }]}
-            >
-              <Input placeholder="e.g., Jakarta" size="large" />
-            </Form.Item>
-          </div>
 
           <Form.Item
             name="address"
-            label="Full Address"
+            label="Address"
             rules={[{ required: true, message: 'Please enter address' }]}
           >
-            <TextArea rows={2} placeholder="Complete address..." />
+            <TextArea
+              rows={3}
+              placeholder="Enter complete address..."
+              size="large"
+            />
           </Form.Item>
 
           <div className="grid grid-cols-2 gap-4">
@@ -272,31 +289,25 @@ const ServiceCentersPage = () => {
               label="Phone Number"
               rules={[{ required: true, message: 'Please enter phone number' }]}
             >
-              <Input placeholder="021-1234567" size="large" />
+              <Input
+                prefix={<PhoneOutlined />}
+                placeholder="e.g., 021-12345678"
+                size="large"
+              />
             </Form.Item>
 
             <Form.Item
               name="email"
               label="Email"
-              rules={[
-                { required: true, message: 'Please enter email' },
-                { type: 'email', message: 'Please enter valid email' }
-              ]}
+              rules={[{ type: 'email', message: 'Please enter a valid email' }]}
             >
-              <Input placeholder="email@ryuservice.com" size="large" />
+              <Input
+                prefix={<MailOutlined />}
+                placeholder="e.g., jakarta@ryu.com"
+                size="large"
+              />
             </Form.Item>
           </div>
-
-          <Form.Item name="operatingHours" label="Operating Hours">
-            <TextArea rows={2} placeholder="e.g., Monday - Friday: 08:00 - 17:00" />
-          </Form.Item>
-
-          <Form.Item name="status" label="Status" initialValue="active">
-            <Select size="large">
-              <Option value="active">Active</Option>
-              <Option value="inactive">Inactive</Option>
-            </Select>
-          </Form.Item>
         </Form>
       </Modal>
     </div>

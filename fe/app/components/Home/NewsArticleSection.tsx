@@ -1,36 +1,65 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-const articles = [
-  {
-    id: 1,
-    image: '/images/article.jpg',
-    title: 'Power Tools Andal untuk Pekerjaan dan Kebutuhan Sehari-hari – RYU',
-    date: '22 October 2025'
-  },
-  {
-    id: 2,
-    image: '/images/article.jpg',
-    title: 'RYU Power Tools: Solusi Andal & Terjangkau untuk Konstruksi, Bengkel, dan DIY',
-    date: '25 September 2025'
-  },
-  {
-    id: 3,
-    image: '/images/article.jpg',
-    title: 'Gathering dan Seminar Welding RYU Power Tools',
-    date: '4 September 2025'
-  },
-  {
-    id: 4,
-    image: '/images/article.jpg',
-    title: 'Hadir di GIIAS 2024, Ryu Powertools Deretan Perkakas Otomotif Terbaiknya',
-    date: '23 July 2024'
-  }
-];
+import { Spin, Empty } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import type { Article } from '@/app/lib/article-api';
+import dayjs from 'dayjs';
 
 export default function NewsArticleSection() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadPublishedArticles();
+  }, []);
+
+  const loadPublishedArticles = async () => {
+    try {
+      // Get articles without auth (public endpoint)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}/article`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch articles');
+      }
+
+      const result = await response.json();
+      const allArticles = result.data || result;
+      
+      // Filter only published articles and get first 4
+      const publishedArticles = Array.isArray(allArticles)
+        ? allArticles
+            .filter((article: Article) => article.status === 'PUBLISHED')
+            .slice(0, 4)
+        : [];
+
+      setArticles(publishedArticles);
+    } catch (error) {
+      console.error('Error loading articles:', error);
+      setArticles([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getImageUrl = (imageUrl?: string): string => {
+    if (!imageUrl) return '/images/article.jpg';
+    
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    
+    return `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}${imageUrl}`;
+  };
+
+  const formatDate = (dateString?: string): string => {
+    if (!dateString) return 'No date';
+    return dayjs(dateString).format('DD MMMM YYYY');
+  };
+
   return (
     <div className="bg-white py-20">
       <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
@@ -42,41 +71,50 @@ export default function NewsArticleSection() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {articles.map((article) => (
-              <Link href={`/blog/${article.id}`} key={article.id}>
-                <div className="flex flex-col h-full group cursor-pointer bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                  <div className="overflow-hidden">
-                    <img 
-                      src={article.image} 
-                      alt={article.title}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-4 line-clamp-3 leading-tight group-hover:text-primary transition-colors text-center">
-                      {article.title}
-                    </h3>
-                    <div className="border-t border-gray-300 -mx-6 mt-auto pt-4 px-6">
-                      <p className="text-xs text-gray-400 text-center">
-                        {article.date}
-                      </p>
+          <Spin 
+            spinning={loading} 
+            indicator={<LoadingOutlined style={{ fontSize: 48, color: '#2d6a2e' }} />}
+          >
+            {articles.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {articles.map((article) => (
+                  <Link href={`/blog/${article.id}`} key={article.id}>
+                    <div className="flex flex-col h-full group cursor-pointer bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                      <div className="overflow-hidden">
+                        <img 
+                          src={getImageUrl(article.primaryImage)} 
+                          alt={article.title}
+                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="p-6 flex flex-col flex-grow">
+                        <h3 className="text-sm font-semibold text-gray-800 mb-4 line-clamp-3 leading-tight group-hover:text-primary transition-colors text-center">
+                          {article.title}
+                        </h3>
+                        <div className="border-t border-gray-300 -mx-6 mt-auto pt-4 px-6">
+                          <p className="text-xs text-gray-400 text-center">
+                            {formatDate(article.publishedAt || article.createdAt)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <Empty 
+                description="No articles available" 
+                style={{ marginTop: '60px', marginBottom: '60px' }}
+              />
+            )}
+          </Spin>
         </div>
-        <div className="text-center mb-16">
-            <h2 className="text-lg lg:text-xl font-bold text-primary underline decoration-2 underline-offset-4">
-              BLOGS
-            </h2>
-          </div>
 
-        
+        <div className="text-center mb-16">
+          <h2 className="text-lg lg:text-xl font-bold text-primary underline decoration-2 underline-offset-4">
+            BLOGS
+          </h2>
+        </div>
       </div>
     </div>
   );

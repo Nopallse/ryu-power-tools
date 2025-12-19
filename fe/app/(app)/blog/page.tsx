@@ -1,60 +1,46 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-const articles = [
-  {
-    id: 1,
-    image: '/images/article.jpg',
-    title: 'Power Tools Andal untuk Pekerjaan dan Kebutuhan Sehari-hari – RYU',
-    date: '22 October 2025'
-  },
-  {
-    id: 2,
-    image: '/images/article.jpg',
-    title: 'RYU Power Tools: Solusi Andal & Terjangkau untuk Konstruksi, Bengkel, dan DIY',
-    date: '25 September 2025'
-  },
-  {
-    id: 3,
-    image: '/images/article.jpg',
-    title: 'Gathering dan Seminar Welding RYU Power Tools',
-    date: '4 September 2025'
-  },
-  {
-    id: 4,
-    image: '/images/article.jpg',
-    title: 'Hadir di GIIAS 2024, Ryu Powertools Deretan Perkakas Otomotif Terbaiknya',
-    date: '23 July 2024'
-  },
-  {
-    id: 5,
-    image: '/images/article.jpg',
-    title: 'Tips Memilih Power Tools yang Tepat untuk Proyek Anda',
-    date: '15 June 2024'
-  },
-  {
-    id: 6,
-    image: '/images/article.jpg',
-    title: 'Perawatan Power Tools untuk Performa Maksimal',
-    date: '8 May 2024'
-  },
-  {
-    id: 7,
-    image: '/images/article.jpg',
-    title: 'Inovasi Terbaru dalam Teknologi Power Tools',
-    date: '22 April 2024'
-  },
-  {
-    id: 8,
-    image: '/images/article.jpg',
-    title: 'RYU Power Tools di Berbagai Industri',
-    date: '10 March 2024'
-  }
-];
+import { Spin, Empty } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import type { Article } from '@/app/lib/article-api';
+import { getPublicArticles } from '@/app/lib/article-api';
 
 export default function BlogPage() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const list = await getPublicArticles();
+        // sort by publishedAt/createdAt desc and take latest 12
+        const sorted = [...list].sort((a, b) => {
+          const da = dayjs(a.publishedAt || a.createdAt);
+          const db = dayjs(b.publishedAt || b.createdAt);
+          return db.valueOf() - da.valueOf();
+        });
+        setArticles(sorted.slice(0, 12));
+      } catch (e) {
+        console.error('Failed to load articles', e);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
+  const getImageUrl = (imageUrl?: string): string => {
+    if (!imageUrl) return '/images/article.jpg';
+    if (imageUrl.startsWith('http')) return imageUrl;
+    return `${apiBase}${imageUrl}`;
+  };
+
+  const formatDate = (date?: string) =>
+    date ? dayjs(date).format('DD MMMM YYYY') : '';
+
   return (
     <div className="bg-white py-20">
       <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
@@ -67,31 +53,40 @@ export default function BlogPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {articles.map((article) => (
-            <Link href={`/blog/${article.id}`} key={article.id}>
-              <div className="flex flex-col h-full group cursor-pointer bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                <div className="overflow-hidden">
-                  <img 
-                    src={article.image} 
-                    alt={article.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-6 flex flex-col flex-grow">
-                  <h3 className="text-sm font-semibold text-gray-800 mb-4 line-clamp-3 leading-tight group-hover:text-[#2d5016] transition-colors text-center">
-                    {article.title}
-                  </h3>
-                  <div className="border-t border-gray-300 -mx-6 mt-auto pt-4 px-6">
-                    <p className="text-xs text-gray-400 text-center">
-                      {article.date}
-                    </p>
+        <Spin
+          spinning={loading}
+          indicator={<LoadingOutlined style={{ fontSize: 48, color: '#2d6a2e' }} />}
+        >
+          {articles.length ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {articles.map((article) => (
+                <Link href={`/blog/${article.id}`} key={article.id}>
+                  <div className="flex flex-col h-full group cursor-pointer bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                    <div className="overflow-hidden">
+                      <img
+                        src={getImageUrl(article.primaryImage)}
+                        alt={article.title}
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="p-6 flex flex-col flex-grow">
+                      <h3 className="text-sm font-semibold text-gray-800 mb-4 line-clamp-3 leading-tight group-hover:text-[#2d5016] transition-colors text-center">
+                        {article.title}
+                      </h3>
+                      <div className="border-t border-gray-300 -mx-6 mt-auto pt-4 px-6">
+                        <p className="text-xs text-gray-400 text-center">
+                          {formatDate(article.publishedAt || article.createdAt)}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <Empty description="No articles found" style={{ marginTop: 60, marginBottom: 60 }} />
+          )}
+        </Spin>
       </div>
     </div>
   );

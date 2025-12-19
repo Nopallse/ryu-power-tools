@@ -1,11 +1,21 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Spin, Empty } from 'antd';
+import { getPublicProductById, getPublicLatestProducts, Product as ApiProduct, ProductImage as ApiProductImage, ProductCategory } from '@/app/lib/product-api';
+import { getPublicCategories, Category as ApiCategory } from '@/app/lib/category-api';
 
-// Hardcoded product data
+const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
+
+const getImageUrl = (url: string | undefined) => {
+  if (!url) return '/images/product.jpg';
+  if (url.startsWith('http')) return url;
+  return `${apiBase}${url}`;
+};
+
+// Hardcoded product data - will be replaced with API
 const products = [
   {
     id: 1,
@@ -196,21 +206,68 @@ const featuredCategories = [
 
 export default function ProductDetailPage() {
   const params = useParams();
-  const productId = parseInt(params.id as string);
-  const product = products.find(p => p.id === productId);
+  const productId = params.id as string;
+  
+  const [product, setProduct] = useState<ApiProduct | null>(null);
+  const [latestProducts, setLatestProducts] = useState<ApiProduct[]>([]);
+  const [featuredCategories, setFeaturedCategories] = useState<ApiCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch product by ID
+        const productData = await getPublicProductById(productId);
+        if (productData) {
+          setProduct(productData);
+        }
+
+        // Fetch latest products
+        const latestData = await getPublicLatestProducts(6);
+        if (latestData) {
+          setLatestProducts(latestData);
+        }
+
+        // Fetch parent categories for featured section
+        const categoriesData = await getPublicCategories();
+        if (categoriesData) {
+          const parentCategories = categoriesData.filter((cat: ApiCategory) => !cat.parentId);
+          setFeaturedCategories(parentCategories.slice(0, 4));
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <div className="bg-white py-20 flex justify-center items-center min-h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
       <div className="bg-white py-20">
         <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16 text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">Product Not Found</h1>
-          <Link href="/" className="text-[#2d5016] hover:underline">
+          <Empty description="Product Not Found" />
+          <Link href="/" className="text-[#2d5016] hover:underline mt-4 inline-block">
             ← Back to Home
           </Link>
         </div>
       </div>
     );
   }
+
+  const primaryImage = product.productImages?.[0] || { url: '/images/product.jpg' };
 
   return (
     <div className="bg-white py-20">
@@ -226,7 +283,7 @@ export default function ProductDetailPage() {
             <div className="mb-6">
               <div className="prose prose-lg max-w-none">
                 <pre className="whitespace-pre-wrap font-sans text-gray-700 text-base leading-relaxed bg-gray-50 p-4 rounded-lg">
-                  {product.shortDescription}
+                  {product.description}
                 </pre>
               </div>
             </div>
@@ -236,10 +293,10 @@ export default function ProductDetailPage() {
               <div className="flex items-start gap-2">
                 <span className="text-gray-600 font-semibold min-w-[100px]">Categories:</span>
                 <div className="flex flex-wrap gap-2">
-                  {product.categories.map((cat, index) => (
+                  {product.productCategory?.map((cat, index) => (
                     <span key={index} className="text-[#2d5016] hover:underline cursor-pointer">
-                      {cat}
-                      {index < product.categories.length - 1 && ', '}
+                      {cat.category.name}
+                      {index < (product.productCategory?.length || 0) - 1 && ', '}
                     </span>
                   ))}
                 </div>
@@ -258,9 +315,12 @@ export default function ProductDetailPage() {
           <div className="order-1 lg:order-2">
             <div className="bg-white rounded-lg overflow-hidden shadow-lg sticky top-24">
               <img 
-                src={product.image} 
+                src={primaryImage.url} 
                 alt={product.name}
                 className="w-full h-auto object-contain"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/images/product.jpg';
+                }}
               />
             </div>
           </div>
@@ -274,25 +334,32 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {latestProducts.map((item) => (
-              <Link href={`/product/${item.id}`} key={item.id}>
-                <div className="flex flex-col items-center">
-                  <div className="w-full bg-white p-5 hover:translate-y-[-8px] transition-all duration-300">
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-full h-full object-contain"
-                    />
+            {latestProducts.map((item) => {
+              const itemImage = item.productImages?.[0] || { url: '/images/product.jpg' };
+              
+              return (
+                <Link href={`/product/${item.id}`} key={item.id}>
+                  <div className="flex flex-col items-center">
+                    <div className="w-full bg-white p-5 hover:translate-y-[-8px] transition-all duration-300">
+                      <img 
+                        src={itemImage.url} 
+                        alt={item.name}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = '/images/product.jpg';
+                        }}
+                      />
+                    </div>
+                    <h4 className="text-xl font-semibold text-[#2d5016] my-5 text-center">
+                      {item.name}
+                    </h4>
+                    <button className="w-full bg-[#e8e8e8] text-[#4a4a4a] border-none font-semibold h-[45px] text-sm tracking-wide uppercase hover:bg-[#2d5016] hover:text-white transition-colors cursor-pointer">
+                      READ MORE
+                    </button>
                   </div>
-                  <h4 className="text-xl font-semibold text-[#2d5016] my-5 text-center">
-                    {item.name}
-                  </h4>
-                  <button className="w-full bg-[#e8e8e8] text-[#4a4a4a] border-none font-semibold h-[45px] text-sm tracking-wide uppercase hover:bg-[#2d5016] hover:text-white transition-colors cursor-pointer">
-                    READ MORE
-                  </button>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </section>
 
@@ -303,21 +370,24 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredCategories.map((category, index) => (
-              <Link href={category.link} key={index}>
+            {featuredCategories.map((category) => (
+              <Link href={`/product-category/${category.slug}`} key={category.id}>
                 <div className="group cursor-pointer">
                   <div className="overflow-hidden rounded-lg mb-4 shadow-md">
                     <img 
-                      src={category.image} 
+                      src={category.imageUrl || '/images/product.jpg'} 
                       alt={category.name}
                       className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/images/product.jpg';
+                      }}
                     />
                   </div>
                   <h4 className="text-xl font-bold text-[#2d5016] mb-2 group-hover:text-[#72bd5a] transition-colors">
                     {category.name}
                   </h4>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    {category.description}
+                    {category.description || 'Explore our range of quality products.'}
                   </p>
                 </div>
               </Link>

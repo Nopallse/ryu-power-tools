@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Layout, Menu, Button } from 'antd';
+import React, { useCallback, useState } from 'react';
+import { Layout, Menu, Button, Spin, App } from 'antd';
 import {
   DashboardOutlined,
   ShoppingOutlined,
@@ -14,7 +14,9 @@ import {
   LogoutOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuthGuard } from '@/app/hooks/useAuthGuard';
+import { logout } from '@/app/lib/auth-client';
 
 const { Header, Sider, Content } = Layout;
 
@@ -25,6 +27,9 @@ export default function AdminLayout({
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { auth, ready } = useAuthGuard();
+  const { message } = App.useApp();
 
   const menuItems = [
     {
@@ -32,25 +37,11 @@ export default function AdminLayout({
       icon: <DashboardOutlined />,
       label: <Link href="/admin">Dashboard</Link>,
     },
-    {
-      key: '/admin/products',
-      icon: <ShoppingOutlined />,
-      label: 'Products',
-      children: [
-        {
-          key: '/admin/products',
-          label: <Link href="/admin/products">All Products</Link>,
-        },
-        {
-          key: '/admin/products/new',
-          label: <Link href="/admin/products/new">Add New</Link>,
-        },
-        {
-          key: '/admin/products/featured',
-          label: <Link href="/admin/products/featured">Featured Products</Link>,
-        },
-      ],
-    },
+      {
+        key: '/admin/products',
+        icon: <ShoppingOutlined />,
+        label: <Link href="/admin/products">Products</Link>,
+      },
     {
       key: '/admin/categories',
       icon: <AppstoreOutlined />,
@@ -93,6 +84,24 @@ export default function AdminLayout({
     },
   ];
 
+  const handleLogout = useCallback(async () => {
+    const hide = message.loading('Logging out...');
+    await logout();
+    hide();
+    message.success('Logged out');
+    router.replace('/login');
+  }, [router]);
+
+  if (!ready) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!auth) return null;
+
   return (
     <Layout className="min-h-screen">
       <Sider
@@ -123,10 +132,11 @@ export default function AdminLayout({
             className="text-lg w-16 h-16"
           />
           <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">{auth?.email}</span>
             <Link href="/" target="_blank">
               <Button type="link">View Site</Button>
             </Link>
-            <Button type="text" icon={<LogoutOutlined />}>
+            <Button type="text" icon={<LogoutOutlined />} onClick={handleLogout}>
               Logout
             </Button>
           </div>

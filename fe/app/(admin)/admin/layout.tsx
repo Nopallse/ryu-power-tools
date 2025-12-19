@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Layout, Menu, Avatar, Dropdown, Space, Typography } from 'antd';
+import React, { useCallback, useState } from 'react';
+import { Layout, Menu, Avatar, Dropdown, Space, Typography, Spin, App } from 'antd';
 import {
   DashboardOutlined,
   AppstoreOutlined,
@@ -17,8 +17,10 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type { MenuProps } from 'antd';
+import { useAuthGuard } from '@/app/hooks/useAuthGuard';
+import { logout } from '@/app/lib/auth-client';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -26,6 +28,9 @@ const { Text } = Typography;
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { auth, ready } = useAuthGuard();
+  const { message } = App.useApp();
 
   const menuItems: MenuProps['items'] = [
     {
@@ -34,48 +39,19 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       label: <Link href="/admin/dashboard">Dashboard</Link>,
     },
     {
-      key: 'products',
+      key: '/admin/products',
       icon: <AppstoreOutlined />,
-      label: 'Products',
-      children: [
-        {
-          key: '/admin/products',
-          label: <Link href="/admin/products">All Products</Link>,
-        },
-        {
-          key: '/admin/products/featured',
-          label: <Link href="/admin/products/featured">Featured Products</Link>,
-        },
-        {
-          key: '/admin/products/latest',
-          label: <Link href="/admin/products/latest">Latest Products</Link>,
-        },
-      ],
+      label: <Link href="/admin/products">Products</Link>,
     },
     {
-      key: 'categories',
+      key: '/admin/categories',
       icon: <TagsOutlined />,
-      label: 'Categories',
-      children: [
-        {
-          key: '/admin/categories',
-          label: <Link href="/admin/categories">All Categories</Link>,
-        },
-        {
-          key: '/admin/categories/subcategories',
-          label: <Link href="/admin/categories/subcategories">Subcategories</Link>,
-        },
-      ],
+      label: <Link href="/admin/categories">Categories</Link>,
     },
     {
       key: '/admin/blog',
-      icon: <BookOutlined />,
-      label: <Link href="/admin/blog">Blog & Articles</Link>,
-    },
-    {
-      key: '/admin/news',
       icon: <FileTextOutlined />,
-      label: <Link href="/admin/news">News & Articles</Link>,
+      label: <Link href="/admin/blog">Blog & Articles</Link>,
     },
     {
       key: '/admin/catalogs',
@@ -116,6 +92,26 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     if (pathname.startsWith('/admin/categories')) return pathname;
     return pathname;
   };
+
+  const handleUserMenuClick: MenuProps['onClick'] = async ({ key }) => {
+    if (key === 'logout') {
+      const hide = message.loading('Logging out...');
+      await logout();
+      hide();
+      message.success('Logged out');
+      router.replace('/login');
+    }
+  };
+
+  if (!ready) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!auth) return null;
 
   return (
     <Layout className="min-h-screen">
@@ -162,11 +158,11 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </button>
 
-          <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+          <Dropdown menu={{ items: userMenuItems, onClick: handleUserMenuClick }} placement="bottomRight">
             <Space className="cursor-pointer hover:bg-gray-50 px-3 py-2 rounded-lg transition-colors">
               <Avatar icon={<UserOutlined />} className="bg-green-600" />
               <div className="hidden md:block">
-                <Text className="text-sm font-medium text-gray-900">Admin User</Text>
+                <Text className="text-sm font-medium text-gray-900">{auth?.email}</Text>
               </div>
             </Space>
           </Dropdown>

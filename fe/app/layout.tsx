@@ -1,6 +1,6 @@
 import React from 'react';
 import { Poppins, Anton } from 'next/font/google';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, App as AntdApp } from 'antd';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import './globals.css';
 import theme from './theme/themeConfig';
@@ -24,7 +24,9 @@ const RootLayout = ({ children }: React.PropsWithChildren) => (
     <body suppressHydrationWarning>
       <AntdRegistry>
         <ConfigProvider theme={theme}>
-          {children}
+          <AntdApp>
+            {children}
+          </AntdApp>
         </ConfigProvider>
       </AntdRegistry>
     </body>

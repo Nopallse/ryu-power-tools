@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { Input, Space, Menu, Drawer, Button } from 'antd';
 import { SearchOutlined, MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import type { CategoryNode } from '@/app/lib/category-api';
+import { getPublicCategoryTree } from '@/app/lib/category-api';
 import styles from './navbar.module.css';
 
-const menuItems: MenuProps['items'] = [
+const staticMenuItems: MenuProps['items'] = [
   {
     key: 'home',
     label: <Link href="/">Home</Link>,
@@ -151,6 +153,57 @@ const Navbar: React.FC = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
   const [language, setLanguage] = useState<'en' | 'id'>('en');
+  const [menuItems, setMenuItems] = useState<MenuProps['items']>(staticMenuItems);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const categoryTree = await getPublicCategoryTree();
+        const dynamicMenuItems = buildMenuItems(categoryTree);
+        setMenuItems(dynamicMenuItems);
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+        // Keep static menu items on error
+      }
+    })();
+  }, []);
+
+  const buildMenuItems = (categories: CategoryNode[]): MenuProps['items'] => {
+    const categoryItems = buildCategoryMenu(categories);
+    
+    // Insert categories into the menu structure
+    return [
+      staticMenuItems![0], // Home
+      staticMenuItems![1], // Blog
+      {
+        key: 'category',
+        label: (
+          <span>
+            Category <span className={styles.arrowIcon} style={{ display: 'inline-block', width: 0, height: 0, borderLeft: '4px solid transparent', borderRight: '4px solid transparent', borderTop: '5px solid #1d1b1b', marginLeft: '4px' }}></span>
+          </span>
+        ),
+        children: categoryItems,
+      },
+      staticMenuItems![3], // Catalog
+      staticMenuItems![4], // Service & Support
+    ];
+  };
+
+  const buildCategoryMenu = (categories: CategoryNode[], parentPath: string = ''): MenuProps['items'] => {
+    if (!categories || categories.length === 0) return [];
+
+    return categories.map((cat) => {
+      const hasChildren = cat.children && cat.children.length > 0;
+      const currentPath = parentPath ? `${parentPath}/${cat.slug}` : cat.slug;
+      const fullPath = `/product-category/category/${currentPath}`;
+      
+      return {
+        key: cat.id,
+        label: hasChildren ? cat.name : <Link href={fullPath}>{cat.name}</Link>,
+        children: hasChildren ? buildCategoryMenu(cat.children!, currentPath) : undefined,
+      };
+    });
+  };
 
   const toggleDrawer = () => {
     setDrawerVisible(!drawerVisible);
