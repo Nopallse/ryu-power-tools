@@ -32,7 +32,21 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ open, onClose, onSubmit, arti
 
   const isEdit = !!article;
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://ryu.pariamankota.tech';
+
+  // Helper function to replace localhost with correct API_BASE in image URLs
+  const addBaseUrlToImages = (html: string): string => {
+    // Replace http://localhost:3000 with API_BASE
+    let result = html.replace(/http:\/\/localhost:3000/g, API_BASE);
+    // Also handle any relative URLs that might not have protocol
+    result = result.replace(/src="(\/[^"]+)"/g, (match, url) => {
+      if (!url.startsWith('http')) {
+        return `src="${API_BASE}${url}"`;
+      }
+      return match;
+    });
+    return result;
+  };
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -48,7 +62,9 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ open, onClose, onSubmit, arti
         seoDescription: article.seoDescription,
         publishedAt: article.publishedAt ? dayjs(article.publishedAt) : undefined,
       });
-      setContentHtml(article.contentHtml || '');
+      // Add API_BASE to relative image URLs in content
+      const contentWithBaseUrl = addBaseUrlToImages(article.contentHtml || '');
+      setContentHtml(contentWithBaseUrl);
 
       if (article.primaryImage) {
         setFileList([
@@ -137,6 +153,21 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ open, onClose, onSubmit, arti
     editorRef.current?.insertImage(imageUrl);
   };
 
+  const handleOpenPreview = () => {
+    const previewData = {
+      title: form.getFieldValue('title') || 'Article Title',
+      contentHtml: contentHtml,
+      primaryImage: fileList[0]?.url || '',
+      publishedAt: form.getFieldValue('publishedAt') ? form.getFieldValue('publishedAt').toISOString() : dayjs().toISOString(),
+    };
+    
+    // Store preview data in sessionStorage
+    sessionStorage.setItem('articlePreview', JSON.stringify(previewData));
+    
+    // Open new window/tab
+    window.open('/preview', 'ArticlePreview', 'width=1400,height=900');
+  };
+
   return (
     <>
       <Modal
@@ -150,6 +181,17 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ open, onClose, onSubmit, arti
         okText={isEdit ? 'Update' : 'Create'}
         cancelText="Cancel"
         destroyOnHidden
+        footer={(_, { OkBtn, CancelBtn }) => (
+          <div className="flex justify-between">
+            <Button onClick={handleOpenPreview} type="primary" size="large">
+              Preview
+            </Button>
+            <div className="space-x-2">
+              <CancelBtn />
+              <OkBtn />
+            </div>
+          </div>
+        )}
       >
         <Form form={form} layout="vertical" className="mt-4">
           <Form.Item
@@ -191,11 +233,11 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ open, onClose, onSubmit, arti
           <Form.Item label={<span>Content <span className="text-red-500">*</span></span>}>
             <div className="mb-2">
               <Button 
-                type="default" 
-                size="small"
+                type="primary" 
+                size="large"
                 onClick={() => setShowImageGallery(true)}
               >
-                📷 Insert Image from Gallery
+                Insert Image
               </Button>
             </div>
             <RichTextEditor

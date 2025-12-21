@@ -203,7 +203,8 @@ export async function getImageArticles(token: string): Promise<ImageArticle[]> {
   }
 
   const result = await response.json();
-  return result.data || result;
+  // Handle nested data structure: result.data.data or result.data
+  return result.data?.data || result.data || result;
 }
 
 export async function uploadImageArticle(
