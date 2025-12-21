@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { Collapse, Spin, Empty } from 'antd';
 import { SearchOutlined, MessageOutlined, RightOutlined, LoadingOutlined } from '@ant-design/icons';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 import type { ServiceCenter } from '@/app/lib/service-center-api';
 import { getPublicServiceCenters } from '@/app/lib/service-center-api';
 
 const ServiceCenterPage: React.FC = () => {
+  const { t } = useLanguage();
   const [serviceCenters, setServiceCenters] = useState<ServiceCenter[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -53,12 +55,12 @@ const ServiceCenterPage: React.FC = () => {
             rel="noopener noreferrer"
             className="text-[#2d5016] font-semibold hover:underline mt-3 inline-flex items-center gap-2"
           >
-            <MessageOutlined /> Chat WhatsApp
+            <MessageOutlined /> {t.serviceCenter.chatWhatsapp}
           </a>
         )}
         {center.email && (
           <p className="text-gray-600 mt-2">
-            <strong>Email:</strong> {center.email}
+            <strong>{t.serviceCenter.email}:</strong> {center.email}
           </p>
         )}
       </div>
@@ -69,9 +71,9 @@ const ServiceCenterPage: React.FC = () => {
     <div className="bg-white py-20">
       <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold text-[#2d5016] mb-3 underline">
-          SERVICE CENTER
-        </h1>
+          <h2 className="text-4xl lg:text-5xl underline font-bold text-[#2d6a2e] mb-4">
+          {t.serviceCenter.title.toUpperCase()}
+        </h2>
       </div>
       {/* Service Centers List */}
       <div className="space-y-4">
@@ -99,7 +101,7 @@ const ServiceCenterPage: React.FC = () => {
             />
           ) : !loading ? (
             <Empty 
-              description="No service centers found"
+              description={t.serviceCenter.noServiceCenters}
               style={{ marginTop: '60px', marginBottom: '60px' }}
             />
           ) : null}
@@ -107,12 +109,12 @@ const ServiceCenterPage: React.FC = () => {
       </div>
 
       {/* Contact CTA */}
-      <div className="mt-16 pt-8 border-t border-black flex ">
+      <div className="mt-16 pt-8 border-t border-black flex justify-center">
         <button
           type="button"
-          className="px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base  tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
+          className="px-6 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base  tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
         >
-          CONTACT US
+          {t.contact.title.toUpperCase()}
         </button>
       </div>
       </div>

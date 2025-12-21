@@ -3,8 +3,11 @@
 import React from 'react';
 import { Button } from 'antd';
 import Link from 'next/link';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 
 export default function CTASection() {
+  const { t } = useLanguage();
+
   return (
     <section className="bg-[#61a86a] min-h-80">
       <div className="flex flex-col lg:flex-row h-full">
@@ -12,13 +15,13 @@ export default function CTASection() {
         <div className="w-full lg:w-2/3 flex items-center px-6 py-10 lg:px-20 lg:py-0">
           <div className="text-black w-full">
             <p className="text-sm font-thin tracking-widest mb-6 opacity-80">
-              POWER. PRECISION. RELIABILITY.
+              {t.home.ctaTagline}
             </p>
             <h2 className="max-w-3xl font-anton text-4xl lg:text-5xl uppercase normal-case no-underline leading-[1.2em] tracking-[4.25px] text-black mb-6">
-              YOUR WORKS DESERVE THE RIGHT TOOLS
+              {t.home.ctaTitle}
             </h2>
             <Link href="/contact" className="!text-black text-sm font-thin">
-              CONTACT US
+              {t.home.ctaLink}
             </Link>
           </div>
         </div>

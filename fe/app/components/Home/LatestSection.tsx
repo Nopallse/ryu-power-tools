@@ -5,8 +5,10 @@ import { Button, Spin, Empty } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { getProducts, type Product } from '@/app/lib/product-api';
 import Link from 'next/link';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 
 export default function LatestSection() {
+  const { t } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,10 +58,10 @@ export default function LatestSection() {
       <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-[#2d6a2e] mb-4">
-            THE LATEST
+            {t.home.latestTitle}
           </h2>
           <p className="text-lg text-gray-600">
-            Latest products
+            {t.home.latestSubtitle}
           </p>
         </div>
 
@@ -71,30 +73,32 @@ export default function LatestSection() {
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
               {products.map((product) => (
                 <div key={product.id} className="flex flex-col h-full items-center justify-between">
-                  <div className="bg-white border-2 border-[#2d6a2e] p-4 mb-4 flex items-center justify-center aspect-square w-full overflow-hidden rounded">
+                  <div className="bg-white border-3 border-[#2d6a2e] flex items-center justify-center aspect-square w-full overflow-hidden ">
                     {product.productImages && product.productImages.length > 0 ? (
                       <img 
                         src={product.productImages[0].url} 
                         alt={product.name}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-300">
-                        No Image
+                        {t.home.noImage}
                       </div>
                     )}
                   </div>
-                  <h3 className="text-center text-sm font-bold text-[#2d6a2e] mb-4 px-2 min-h-[4.5rem] flex items-center justify-center flex-grow">
+                  <h3 className="text-center text-sm font-bold text-[#2d6a2e] px-2 min-h-[4.5rem] flex items-center justify-center flex-grow">
                     {product.name}
                   </h3>
-                  <Link href={`/product/${product.id}`} className="w-full">
-                    <Button 
-                      type="primary"
-                      className="w-full !bg-[#2d6a2e] hover:!bg-[#3d8a3e] !border-none !rounded !h-10 font-semibold !px-6 mt-auto"
-                    >
-                      READ MORE
-                    </Button>
-                  </Link>
+                    <div className="w-full flex justify-center">
+                      <Link href={`/product/${product.id}`} className="w-full flex justify-center">
+                      <Button 
+                        type="primary"
+                        className="!bg-[#2d6a2e] hover:!bg-[#3d8a3e] !border-none !rounded !h-10 font-semibold !px-6 mt-auto mx-auto block"
+                      >
+                        {t.home.latestReadMore}
+                      </Button>
+                      </Link>
+                    </div>
                 </div>
               ))}
             </div>

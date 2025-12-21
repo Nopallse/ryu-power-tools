@@ -1,223 +1,109 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { Spin, Empty } from 'antd';
-import { getPublicProductById, getPublicLatestProducts, Product as ApiProduct, ProductImage as ApiProductImage, ProductCategory } from '@/app/lib/product-api';
-import { getPublicCategories, Category as ApiCategory } from '@/app/lib/category-api';
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { Spin, Empty } from "antd";
+import { useLanguage } from "@/app/providers/LanguageProvider";
+import {
+  getPublicProductById,
+  getPublicLatestProducts,
+  Product as ApiProduct,
+  ProductImage as ApiProductImage,
+  ProductCategory,
+} from "@/app/lib/product-api";
+import {
+  getPublicCategoryTree,
+  CategoryNode as ApiCategoryNode,
+} from "@/app/lib/category-api";
 
-const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
+const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
 const getImageUrl = (url: string | undefined) => {
-  if (!url) return '/images/product.jpg';
-  if (url.startsWith('http')) return url;
+  if (!url) return "/images/product.jpg";
+  if (url.startsWith("http")) return url;
   return `${apiBase}${url}`;
 };
 
-// Hardcoded product data - will be replaced with API
-const products = [
-  {
-    id: 1,
-    name: 'Cable Connector (Female)',
-    image: '/images/product.jpg',
-    shortDescription: `Ukuran Kabel Las : 10 – 25 mm
-Maksimal Arus : 200 A
-Material : Tembaga
-Qty Inner/Master : 20 / 500`,
-    categories: ['Accessories', 'Cable Connector'],
-    description: `
-      <h3>Spesifikasi Produk</h3>
-      <ul>
-        <li><strong>Ukuran Kabel Las:</strong> 10 – 25 mm</li>
-        <li><strong>Maksimal Arus:</strong> 200 A</li>
-        <li><strong>Material:</strong> Tembaga</li>
-        <li><strong>Qty Inner/Master:</strong> 20 / 500</li>
-      </ul>
+// ZoomableImage component for preview modal
+const ZoomableImage = ({ src, alt }: { src: string; alt: string }) => {
+  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-      <h3>Keunggulan</h3>
-      <p>Cable Connector (Female) dari RYU dirancang khusus untuk sambungan kabel las dengan kualitas tembaga premium yang memastikan konduktivitas listrik optimal.</p>
-      
-      <ul>
-        <li>Material tembaga berkualitas tinggi untuk konduktivitas maksimal</li>
-        <li>Tahan terhadap arus hingga 200 A</li>
-        <li>Desain kokoh dan tahan lama</li>
-        <li>Mudah dipasang dan dilepas</li>
-        <li>Cocok untuk berbagai ukuran kabel las</li>
-      </ul>
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.2 : 0.2;
+    setScale((prev) => Math.min(Math.max(1, prev + delta), 4));
+  };
 
-      <h3>Aplikasi</h3>
-      <p>Produk ini sangat cocok digunakan untuk:</p>
-      <ul>
-        <li>Pengelasan industri</li>
-        <li>Bengkel las profesional</li>
-        <li>Konstruksi dan fabrikasi</li>
-        <li>Maintenance dan repair</li>
-      </ul>
-    `
-  },
-  {
-    id: 2,
-    name: 'Abrasive Disc 4"',
-    image: '/images/product.jpg',
-    shortDescription: `Size: 4 inch
-Grit: 80
-Speed: 13,000 RPM
-Material: Aluminum Oxide`,
-    categories: ['Accessories', 'Abrasive'],
-    description: `
-      <h3>Spesifikasi Produk</h3>
-      <ul>
-        <li><strong>Size:</strong> 4 inch</li>
-        <li><strong>Grit:</strong> 80</li>
-        <li><strong>Speed:</strong> 13,000 RPM</li>
-        <li><strong>Material:</strong> Aluminum Oxide</li>
-      </ul>
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (scale > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+    }
+  };
 
-      <h3>Keunggulan</h3>
-      <p>Abrasive Disc profesional untuk penggerindaan dan pemotongan berbagai material dengan performa tinggi.</p>
-    `
-  },
-  {
-    id: 3,
-    name: 'ROUTER RRT12-1',
-    image: '/images/product.jpg',
-    shortDescription: `Power: 1200W
-Speed: 30,000 RPM
-Collet: 6mm & 8mm
-Weight: 2.5kg`,
-    categories: ['Power Tools', 'Router'],
-    description: `
-      <h3>Spesifikasi Produk</h3>
-      <ul>
-        <li><strong>Power:</strong> 1200W</li>
-        <li><strong>Speed:</strong> 30,000 RPM</li>
-        <li><strong>Collet:</strong> 6mm & 8mm</li>
-        <li><strong>Weight:</strong> 2.5kg</li>
-      </ul>
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging && scale > 1) {
+      setPosition({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
+    }
+  };
 
-      <h3>Keunggulan</h3>
-      <p>Router berkualitas tinggi untuk pekerjaan woodworking profesional dengan motor powerful dan kontrol presisi.</p>
-    `
-  },
-  {
-    id: 4,
-    name: 'CORDLESS DRILL 12V-1 RCD12V-1',
-    image: '/images/product.jpg',
-    shortDescription: `Voltage: 12V
-Battery: Lithium-ion
-Chuck Size: 10mm
-Torque: 30Nm`,
-    categories: ['Power Tools', 'Cordless'],
-    description: `
-      <h3>Spesifikasi Produk</h3>
-      <ul>
-        <li><strong>Voltage:</strong> 12V</li>
-        <li><strong>Battery:</strong> Lithium-ion</li>
-        <li><strong>Chuck Size:</strong> 10mm</li>
-        <li><strong>Torque:</strong> 30Nm</li>
-      </ul>
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
-      <h3>Keunggulan</h3>
-      <p>Cordless drill compact dan powerful, ideal untuk berbagai aplikasi drilling dan screwdriving.</p>
-    `
-  },
-  {
-    id: 5,
-    name: 'ANGLE GRINDER 4" RAG100',
-    image: '/images/product.jpg',
-    shortDescription: `Power: 850W
-Disc Size: 4 inch (100mm)
-Speed: 11,000 RPM
-Weight: 2.1kg`,
-    categories: ['Power Tools', 'Angle Grinder'],
-    description: `
-      <h3>Spesifikasi Produk</h3>
-      <ul>
-        <li><strong>Power:</strong> 850W</li>
-        <li><strong>Disc Size:</strong> 4 inch (100mm)</li>
-        <li><strong>Speed:</strong> 11,000 RPM</li>
-        <li><strong>Weight:</strong> 2.1kg</li>
-      </ul>
-
-      <h3>Keunggulan</h3>
-      <p>Angle grinder powerful untuk cutting dan grinding dengan desain ergonomis dan motor tahan lama.</p>
-    `
-  },
-  {
-    id: 6,
-    name: 'WELDING INVERTER 160A',
-    image: '/images/product.jpg',
-    shortDescription: `Output: 160A
-Input Voltage: 220V
-Electrode: 1.6-4.0mm
-Weight: 5.5kg`,
-    categories: ['Welding', 'Inverter'],
-    description: `
-      <h3>Spesifikasi Produk</h3>
-      <ul>
-        <li><strong>Output:</strong> 160A</li>
-        <li><strong>Input Voltage:</strong> 220V</li>
-        <li><strong>Electrode:</strong> 1.6-4.0mm</li>
-        <li><strong>Weight:</strong> 5.5kg</li>
-      </ul>
-
-      <h3>Keunggulan</h3>
-      <p>Welding inverter portable dengan teknologi IGBT untuk hasil pengelasan berkualitas tinggi.</p>
-    `
-  }
-];
-
-const latestProducts = [
-  { id: 3, name: 'ROUTER RRT12-1', image: '/images/product.jpg', category: 'Router' },
-  { id: 4, name: 'CORDLESS DRILL 12V-1', image: '/images/product.jpg', category: 'Cordless' },
-  { id: 5, name: 'ANGLE GRINDER 4"', image: '/images/product.jpg', category: 'Angle Grinder' },
-  { id: 6, name: 'WELDING INVERTER 160A', image: '/images/product.jpg', category: 'Inverter' },
-  { id: 1, name: 'Cable Connector Female', image: '/images/product.jpg', category: 'Cable Connector' },
-  { id: 2, name: 'Abrasive Disc 4"', image: '/images/product.jpg', category: 'Abrasive' }
-];
-
-const featuredCategories = [
-  {
-    name: 'Power Tools',
-    image: '/images/product.jpg',
-    description: 'High-performance tools for cutting, drilling, and grinding—built to make your work faster and easier.',
-    link: '/product-category/power-tools'
-  },
-  {
-    name: 'Engine',
-    image: '/images/product.jpg',
-    description: 'Reliable engines designed to power machines efficiently, giving you consistent performance in every job.',
-    link: '/product-category/engine'
-  },
-  {
-    name: 'Welding',
-    image: '/images/product.jpg',
-    description: 'Durable welding equipment that ensures strong, clean joins—perfect for both beginners and pros.',
-    link: '/product-category/welding'
-  },
-  {
-    name: 'Accessories',
-    image: '/images/product.jpg',
-    description: 'Essential add-ons and spare parts to keep your tools running smoothly and ready for any task.',
-    link: '/product-category/accessories'
-  }
-];
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="max-w-full max-h-[70vh] object-contain select-none"
+      style={{
+        transform: `scale(${scale}) translate(${position.x / scale}px, ${
+          position.y / scale
+        }px)`,
+        cursor: scale > 1 ? (isDragging ? "grabbing" : "grab") : "zoom-in",
+        transition: isDragging ? "none" : "transform 0.2s",
+      }}
+      onWheel={handleWheel}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onClick={() => scale === 1 && setScale(2)}
+      onDoubleClick={() => {
+        setScale(1);
+        setPosition({ x: 0, y: 0 });
+      }}
+      onError={(e) => {
+        (e.currentTarget as HTMLImageElement).src = "/images/product.jpg";
+      }}
+      draggable={false}
+    />
+  );
+};
 
 export default function ProductDetailPage() {
+  const { t } = useLanguage();
   const params = useParams();
   const productId = params.id as string;
-  
+
   const [product, setProduct] = useState<ApiProduct | null>(null);
   const [latestProducts, setLatestProducts] = useState<ApiProduct[]>([]);
-  const [featuredCategories, setFeaturedCategories] = useState<ApiCategory[]>([]);
+  const [featuredCategories, setFeaturedCategories] = useState<
+    ApiCategoryNode[]
+  >([]);
   const [loading, setLoading] = useState(true);
+  const [showPreview, setShowPreview] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch product by ID
         const productData = await getPublicProductById(productId);
         if (productData) {
@@ -230,14 +116,15 @@ export default function ProductDetailPage() {
           setLatestProducts(latestData);
         }
 
-        // Fetch parent categories for featured section
-        const categoriesData = await getPublicCategories();
-        if (categoriesData) {
-          const parentCategories = categoriesData.filter((cat: ApiCategory) => !cat.parentId);
-          setFeaturedCategories(parentCategories.slice(0, 4));
+        // Fetch parent categories from tree for featured section
+        const categoryTree = await getPublicCategoryTree();
+        if (categoryTree) {
+          setFeaturedCategories(
+            Array.isArray(categoryTree) ? categoryTree.slice(0, 4) : []
+          );
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -258,16 +145,23 @@ export default function ProductDetailPage() {
     return (
       <div className="bg-white py-20">
         <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16 text-center">
-          <Empty description="Product Not Found" />
-          <Link href="/" className="text-[#2d5016] hover:underline mt-4 inline-block">
-            ← Back to Home
+          <Empty description={t.product.productNotFound} />
+          <Link
+            href="/"
+            className="text-[#2d5016] hover:underline mt-4 inline-block"
+          >
+            {t.product.backToHome}
           </Link>
         </div>
       </div>
     );
   }
 
-  const primaryImage = product.productImages?.[0] || { url: '/images/product.jpg' };
+  const primaryImage = product.productImages?.[selectedImageIndex] || 
+    product.productImages?.[0] || {
+    url: "/images/product.jpg",
+  };
+  const primaryImageUrl = getImageUrl(primaryImage.url);
 
   return (
     <div className="bg-white py-20">
@@ -282,7 +176,10 @@ export default function ProductDetailPage() {
 
             <div className="mb-6">
               <div className="prose prose-lg max-w-none">
-                <pre className="whitespace-pre-wrap font-sans text-gray-700 text-base leading-relaxed bg-gray-50 p-4 rounded-lg">
+                <span className="text-[#333] font-bold min-w-[100px] text-base">
+                  {t.product.specifications}:
+                </span>
+                <pre className="whitespace-pre-wrap font-sans text-black leading-relaxed  py-4 rounded-lg text-sm">
                   {product.description}
                 </pre>
               </div>
@@ -291,12 +188,18 @@ export default function ProductDetailPage() {
             {/* Categories */}
             <div className="mb-6 pb-6 border-b border-gray-200">
               <div className="flex items-start gap-2">
-                <span className="text-gray-600 font-semibold min-w-[100px]">Categories:</span>
+                <span className="text-[#333] font-bold min-w-[100px] text-base">
+                  {t.product.categories}:
+                </span>
                 <div className="flex flex-wrap gap-2">
                   {product.productCategory?.map((cat, index) => (
-                    <span key={index} className="text-[#2d5016] hover:underline cursor-pointer">
+                    <span
+                      key={index}
+                      className="text-[#2d5016] hover:underline cursor-pointer"
+                    >
                       {cat.category.name}
-                      {index < (product.productCategory?.length || 0) - 1 && ', '}
+                      {index < (product.productCategory?.length || 0) - 1 &&
+                        ", "}
                     </span>
                   ))}
                 </div>
@@ -304,24 +207,143 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Contact Button */}
-            <Link href="/contact">
-              <button className="px-8 sm:px-10 py-3 sm:py-3.5 rounded-full border border-[#2d5016] bg-[#2d5016] text-white text-sm sm:text-base font-semibold tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer mb-8">
-                CONTACT US
+            <div className="flex justify-center sm:justify-start">
+              <Link href="/contact">
+              <button className="px-8 sm:px-10 py-3 sm:py-3.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base font-semibold tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer mb-8">
+                {t.product.contactUs}
               </button>
-            </Link>
+              </Link>
+            </div>
           </div>
 
           {/* Right Column - Image */}
           <div className="order-1 lg:order-2">
-            <div className="bg-white rounded-lg overflow-hidden shadow-lg sticky top-24">
-              <img 
-                src={primaryImage.url} 
-                alt={product.name}
-                className="w-full h-auto object-contain"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = '/images/product.jpg';
-                }}
-              />
+            <div className="bg-white rounded-lg overflow-hidden shadow-lg sticky top-24 relative group">
+              <div
+                className="overflow-hidden cursor-zoom-in"
+                style={{ position: "relative" }}
+                tabIndex={0}
+                onClick={() => setShowPreview(true)}
+              >
+                <img
+                  src={primaryImageUrl}
+                  alt={product.name}
+                  className="w-full h-auto object-contain transition-none"
+                  style={{ transition: "none" }}
+                  onMouseMove={(e) => {
+                    const img = e.currentTarget;
+                    const rect = img.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    img.style.transformOrigin = `${x}% ${y}%`;
+                    img.style.transform = "scale(2)";
+                  }}
+                  onMouseLeave={(e) => {
+                    const img = e.currentTarget;
+                    img.style.transform = "scale(1)";
+                    img.style.transformOrigin = "center center";
+                  }}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src =
+                      "/images/product.jpg";
+                  }}
+                />
+                {/* View Image Button */}
+                <button
+                  type="button"
+                  className="absolute top-3 right-3 bg-white bg-opacity-80 rounded-full p-2 shadow hover:bg-opacity-100 transition"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowPreview(true);
+                  }}
+                  title="View Image"
+                >
+                  {/* Magnifier Icon SVG */}
+                  <svg
+                    width="24"
+                    height="24"
+                    fill="none"
+                    stroke="#2d5016"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="11" cy="11" r="7" />
+                    <line x1="16.5" y1="16.5" x2="21" y2="21" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Thumbnail Images */}
+              {product.productImages && product.productImages.length > 1 && (
+                <div className="flex gap-2 mt-4 overflow-x-auto p-2">
+                  {product.productImages.map((img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className={`flex-shrink-0 w-20 h-20 border-2 rounded-lg overflow-hidden transition-all ${
+                        selectedImageIndex === index
+                          ? "border-[#2d5016] ring-2 ring-[#2d5016]"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    >
+                      <img
+                        src={getImageUrl(img.url)}
+                        alt={`${product.name} - ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src =
+                            "/images/product.jpg";
+                        }}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Preview Modal */}
+              {showPreview && (
+                <div
+                  className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center"
+                  onClick={() => setShowPreview(false)}
+                >
+                  <div
+                    className="relative bg-white rounded-lg p-4 max-w-3xl w-full flex flex-col items-center"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      className="absolute top-2 right-2 bg-white rounded-full p-2 shadow"
+                      onClick={() => setShowPreview(false)}
+                      aria-label="Close"
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        fill="none"
+                        stroke="#2d5016"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                        <line x1="6" y1="18" x2="18" y2="6" />
+                      </svg>
+                    </button>
+                    <div
+                      className="overflow-hidden cursor-zoom-in w-full flex justify-center items-center"
+                      style={{ maxHeight: "70vh" }}
+                      tabIndex={0}
+                      onClick={(e) => {
+                        // Prevent closing modal on image click
+                        e.stopPropagation();
+                      }}
+                    >
+                      <ZoomableImage
+                        src={primaryImageUrl}
+                        alt={product.name}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -329,32 +351,36 @@ export default function ProductDetailPage() {
         {/* Latest Products Section */}
         <section className="mb-20">
           <div className="text-center mb-8">
-            <h3 className="text-3xl font-bold text-[#2d5016] mb-2">THE LATEST</h3>
-            <p className="text-gray-600">Latest products</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4 decoration-2 underline-offset-4">
+              {t.product.latest}
+            </h2>
+            <p className="text-gray-600">{t.product.latestSubtitle}</p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {latestProducts.map((item) => {
-              const itemImage = item.productImages?.[0] || { url: '/images/product.jpg' };
-              
+              const itemImage = item.productImages?.[0] 
+              const itemImageUrl = getImageUrl(itemImage.url);
+
               return (
                 <Link href={`/product/${item.id}`} key={item.id}>
-                  <div className="flex flex-col items-center">
-                    <div className="w-full bg-white p-5 hover:translate-y-[-8px] transition-all duration-300">
-                      <img 
-                        src={itemImage.url} 
+                  <div className="flex flex-col h-full items-center justify-between">
+                    <div className="bg-white border-3 border-[#2d6a2e] flex items-center justify-center aspect-square w-full overflow-hidden ">
+                      <img
+                        src={itemImageUrl}
                         alt={item.name}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-cover"
                         onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = '/images/product.jpg';
+                          (e.currentTarget as HTMLImageElement).src =
+                            "/images/product.jpg";
                         }}
                       />
                     </div>
                     <h4 className="text-xl font-semibold text-[#2d5016] my-5 text-center">
                       {item.name}
                     </h4>
-                    <button className="w-full bg-[#e8e8e8] text-[#4a4a4a] border-none font-semibold h-[45px] text-sm tracking-wide uppercase hover:bg-[#2d5016] hover:text-white transition-colors cursor-pointer">
-                      READ MORE
+                    <button className="px-6 py-2 bg-primary text-white border-none font-semibold text-sm tracking-wide uppercase hover:bg-[#2d5016] hover:text-white transition-colors cursor-pointer">
+                      {t.product.readMore}
                     </button>
                   </div>
                 </Link>
@@ -366,33 +392,45 @@ export default function ProductDetailPage() {
         {/* Featured Products Section */}
         <section>
           <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-[#2d5016]">FEATURED PRODUCTS</h3>
+            <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4 underline decoration-2 underline-offset-4">
+              {t.product.featured}
+            </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredCategories.map((category) => (
-              <Link href={`/product-category/${category.slug}`} key={category.id}>
-                <div className="group cursor-pointer">
-                  <div className="overflow-hidden rounded-lg mb-4 shadow-md">
-                    <img 
-                      src={category.imageUrl || '/images/product.jpg'} 
-                      alt={category.name}
-                      className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-500"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/images/product.jpg';
-                      }}
-                    />
-                  </div>
-                  <h4 className="text-xl font-bold text-[#2d5016] mb-2 group-hover:text-[#72bd5a] transition-colors">
-                    {category.name}
-                  </h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {category.description || 'Explore our range of quality products.'}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {featuredCategories.map((category) => (
+                <div key={category.id} className="group">
+                  <Link
+                    href={`/product-category/${category.slug}`}
+                    className="block cursor-pointer"
+                  >
+                    <div className="overflow-hidden rounded-none mb-4 shadow-md hover:scale-110 transition-transform duration-500">
+                      <img
+                        src={getImageUrl(category.imageUrl)}
+                        alt={category.name}
+                        className="w-full object-contain"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src =
+                            "/images/product.jpg";
+                        }}
+                      />
+                    </div>
+                  </Link>
+                  <Link
+                    href={`/product-category/${category.slug}`}
+                    className="block cursor-pointer"
+                  >
+                    <h4 className="text-xl font-bold text-[#2d5016] mb-2 hover:text-[#72bd5a] transition-colors">
+                      {category.name}
+                    </h4>
+                  </Link>
+                  <p className="text-[#324A6D] text-sm lg:text-base leading-relaxed select-text cursor-text group-hover:cursor-text">
+                    {category.description ||
+                      t.product.exploreRange}
                   </p>
                 </div>
-              </Link>
-            ))}
-          </div>
+              ))}
+            </div>
         </section>
       </div>
     </div>

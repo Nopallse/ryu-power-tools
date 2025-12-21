@@ -14,6 +14,7 @@ import {
   Upload,
   Tag,
   Image,
+  TreeSelect,
 } from 'antd';
 import {
   PlusOutlined,
@@ -29,6 +30,7 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadFile } from 'antd/es/upload/interface';
 import { getProducts, createProduct, updateProduct, deleteProduct, type Product, type ProductImage } from '@/app/lib/product-api';
+import { getCategoryTree, type TreeSelectNode } from '@/app/lib/category-api';
 import { useAuthGuard } from '@/app/hooks/useAuthGuard';
 import { App } from 'antd';
 
@@ -40,6 +42,7 @@ const ProductsPage = () => {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [categoryTree, setCategoryTree] = useState<TreeSelectNode[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,10 +68,14 @@ const ProductsPage = () => {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const data = await getProducts(auth!.token);
+      const [data, tree] = await Promise.all([
+        getProducts(auth!.token),
+        getCategoryTree(auth!.token),
+      ]);
       const list = Array.isArray(data) ? data : [];
       setProducts(list);
       setFilteredProducts(list);
+      setCategoryTree(Array.isArray(tree) ? tree : []);
     } catch (error) {
       message.error('Failed to load products');
       console.error(error);
@@ -80,10 +87,13 @@ const ProductsPage = () => {
   const showModal = (product?: Product) => {
     if (product) {
       setEditingId(product.id);
+      // Extract category IDs from productCategory
+      const categoryIds = product.productCategory?.map((cat) => cat.categoryId) || [];
       form.setFieldsValue({
         name: product.name,
         description: product.description,
         storeUrl: product.storeUrl,
+        categoryIds: categoryIds,
       });
       // Set existing images from the product
       setExistingImages(product.productImages || []);
@@ -123,6 +133,13 @@ const ProductsPage = () => {
       formData.append('name', values.name);
       formData.append('description', values.description || '');
       formData.append('storeUrl', values.storeUrl || '');
+
+      // Add category IDs to formData
+      if (values.categoryIds && values.categoryIds.length > 0) {
+        values.categoryIds.forEach((categoryId: string) => {
+          formData.append('categoryIds', categoryId);
+        });
+      }
 
       fileList.forEach((file) => {
         if (file.originFileObj) {
@@ -330,6 +347,23 @@ const ProductsPage = () => {
               prefix={<LinkOutlined />}
               placeholder="https://store.example.com/product"
               size="large"
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="categoryIds"
+            label="Categories"
+          >
+            <TreeSelect
+              treeData={categoryTree}
+              placeholder="Select categories"
+              allowClear
+              multiple
+              treeCheckable
+              showCheckedStrategy={TreeSelect.SHOW_ALL}
+              treeDefaultExpandAll
+              size="large"
+              style={{ width: '100%' }}
             />
           </Form.Item>
 

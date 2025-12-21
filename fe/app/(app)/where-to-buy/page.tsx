@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import { useLanguage } from '@/app/providers/LanguageProvider';
 
 type Marketplace = {
   name: string;
@@ -52,13 +54,15 @@ const marketplaces: Marketplace[] = [
 ];
 
 const WhereToBuyPage = () => {
+  const { t } = useLanguage();
+  
   return (
     <div className="bg-white py-20">
       <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16 text-center">
         <h1 className="text-2xl sm:text-3xl font-bold text-primary underline mb-4">
-          Marketplace &amp; E-commerce Official Store
+          {t.whereToBuy.title}
         </h1>
-        <p className="text-lg text-primary mb-12">We are available at</p>
+        <p className="text-lg text-primary mb-12">{t.whereToBuy.subtitle}</p>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-10 gap-y-12 justify-items-center">
           {marketplaces.map((item) => (

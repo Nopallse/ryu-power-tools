@@ -21,7 +21,7 @@ export type Article = {
 
 export type ImageArticle = {
   id: string;
-  imageUrl: string;
+  url: string;
   createdAt: string;
 };
 
@@ -206,7 +206,33 @@ export async function getImageArticles(token: string): Promise<ImageArticle[]> {
   return result.data || result;
 }
 
-export async function deleteImageArticle(id: string, token: string): Promise<void> {
+export async function uploadImageArticle(
+  formData: FormData,
+  token: string
+): Promise<ImageArticle> {
+  if (!token) {
+    console.error('ERROR: No token provided to uploadImageArticle');
+    throw new Error("Authentication token is missing");
+  }
+
+  const response = await fetch(`${API_BASE}/article/upload-image`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const message = await safeErrorMessage(response);
+    throw new Error(message ?? "Failed to upload image");
+  }
+
+  const result = await response.json();
+  return result.data || result;
+}
+
+export async function deleteImageArticle(id: string, imageUrl: string, token: string): Promise<void> {
   if (!token) {
     console.error('ERROR: No token provided to deleteImageArticle');
     throw new Error("Authentication token is missing");
@@ -216,7 +242,9 @@ export async function deleteImageArticle(id: string, token: string): Promise<voi
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({ imageUrl }),
   });
 
   if (!response.ok) {

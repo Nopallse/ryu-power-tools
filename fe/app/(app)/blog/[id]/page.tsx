@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 import type { Article } from '@/app/lib/article-api';
 import { getPublicArticleById, getPublicArticles } from '@/app/lib/article-api';
 
 export default function BlogDetailPage() {
+  const { t } = useLanguage();
   const params = useParams();
   const id = params.id as string;
   const [article, setArticle] = useState<Article | null>(null);
@@ -49,9 +51,9 @@ export default function BlogDetailPage() {
     return (
       <div className="bg-white py-20">
         <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16 text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">Article Not Found</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">{t.blog.articleNotFound}</h1>
           <Link href="/blog" className="text-[#2d5016] hover:underline">
-            ← Back to Blog
+            {t.blog.backToBlog}
           </Link>
         </div>
       </div>
@@ -60,7 +62,7 @@ export default function BlogDetailPage() {
 
   return (
     <div className="bg-white py-20">
-      <div className="container mx-auto max-w-4xl px-8 sm:px-12 lg:px-16">
+      <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
         {article && (
           <article className="bg-white">
             <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
@@ -83,12 +85,15 @@ export default function BlogDetailPage() {
 
             <div
               className="prose prose-lg max-w-none
-                [&_p]:text-gray-700 [&_p]:leading-relaxed [&_p]:text-base
-                [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:text-[#2d5016] [&_h3]:mb-4 [&_h3]:mt-8
+                [&_p]:text-gray-700 [&_p]:leading-relaxed [&_p]:text-base [&_p]:break-words
+                [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-[#2d5016] [&_h2]:mb-4 [&_h2]:mt-8 [&_h2]:break-words
+                [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:text-[#2d5016] [&_h3]:mb-4 [&_h3]:mt-8 [&_h3]:break-words
                 [&_ul]:list-disc [&_ul]:list-inside [&_ul]:mb-6 [&_ul]:space-y-2
-                [&_li]:text-gray-700
+                [&_li]:text-gray-700 [&_li]:break-words
+                [&_a]:text-[#2d5016] [&_a]:underline [&_a]:break-all
                 [&_figure]:mb-8 [&_figure]:mt-8
-                [&_img]:w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:shadow-md"
+                [&_img]:w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:shadow-md
+                break-words overflow-wrap-anywhere"
               dangerouslySetInnerHTML={{ __html: article.contentHtml }}
             />
           </article>
@@ -96,7 +101,7 @@ export default function BlogDetailPage() {
 
         {related.length > 0 && (
           <section className="mt-16 pt-8 border-t border-gray-200">
-            <h3 className="text-2xl font-bold text-[#2d5016] mb-6">You Might Also Like</h3>
+            <h3 className="text-2xl font-bold text-[#2d5016] mb-6">{t.blog.relatedArticles}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {related.map((r) => (
                 <Link href={`/blog/${r.id}`} key={r.id}>

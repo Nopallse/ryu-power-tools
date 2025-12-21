@@ -1,193 +1,167 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Input, Space, Menu, Drawer, Button } from 'antd';
+import { usePathname, useRouter } from 'next/navigation';
+import { Input, Menu, Drawer } from 'antd';
 import { SearchOutlined, MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import type { CategoryNode } from '@/app/lib/category-api';
 import { getPublicCategoryTree } from '@/app/lib/category-api';
-import styles from './navbar.module.css';
+import { useLanguage } from '@/app/providers/LanguageProvider';
+import { languages, type Language } from '@/app/i18n';
+import styles from "./navbar.module.css";
 
-const staticMenuItems: MenuProps['items'] = [
-  {
-    key: 'home',
-    label: <Link href="/">Home</Link>,
-  },
-  {
-    key: 'blog',
-    label: <Link href="/blog">Blog</Link>,
-  },
-  {
-    key: 'category',
-    label: (
-      <span>
-        Category <span className={styles.arrowIcon} style={{ display: 'inline-block', width: 0, height: 0, borderLeft: '4px solid transparent', borderRight: '4px solid transparent', borderTop: '5px solid #1d1b1b', marginLeft: '4px' }}></span>
-      </span>
-    ),
-    children: [
-      {
-        key: 'accessories',
-        label: 'Accessories',
-        children: [
-          { key: 'accessories-cable', label: <Link href="/product-category/accessories/cable-connector">Cable Connector</Link> },
-          { key: 'accessories-abrasive', label: <Link href="/product-category/accessories/abrasive">Abrasive</Link> },
-          { key: 'accessories-blade', label: <Link href="/product-category/accessories/circular-saw-blade">Circular Saw Blade</Link> },
-          { key: 'accessories-wheel', label: <Link href="/product-category/accessories/diamond-wheel">Diamond Wheel</Link> },
-          { key: 'accessories-drill', label: <Link href="/product-category/accessories/drill-bits">Drill Bits</Link> },
-          { key: 'accessories-planner', label: <Link href="/product-category/accessories/planner-blade">Planner Blade</Link> },
-        ],
-      },
-      {
-        key: 'engine',
-        label: 'Engine',
-        children: [
-          { key: 'engine-chainsaw', label: <Link href="/product-category/engine/chain-saw">Chain Saw</Link> },
-          { key: 'engine-compressor', label: <Link href="/product-category/engine/compressor">Compressor</Link> },
-          { key: 'engine-gasoline', label: <Link href="/product-category/engine/gasoline-engine">Gasoline Engine</Link> },
-          { key: 'engine-generator', label: <Link href="/product-category/engine/generator">Generator</Link> },
-          { key: 'engine-waterpump', label: <Link href="/product-category/engine/waterpump">Waterpump</Link> },
-        ],
-      },
-      {
-        key: 'power-tools',
-        label: 'Power Tools',
-        children: [
-          {
-            key: 'metal-working',
-            label: 'Metal Working',
-            children: [
-              { key: 'angle-grinder', label: <Link href="/product-category/power-tools/angle-grinder">Angle Grinder</Link> },
-              { key: 'bench-drill', label: <Link href="/product-category/power-tools/bench-drill">Bench Drill</Link> },
-              { key: 'cut-off-saw', label: <Link href="/product-category/power-tools/cut-off-saw">Cut Off saw</Link> },
-              { key: 'die-grinders', label: <Link href="/product-category/power-tools/die-grinders">Die Grinders</Link> },
-              { key: 'drill', label: <Link href="/product-category/power-tools/drill">Drill</Link> },
-              { key: 'impact-drill', label: <Link href="/product-category/power-tools/impact-drill">Impact Drill</Link> },
-              { key: 'magnetic-drill', label: <Link href="/product-category/power-tools/magnetic-drill">Magnetic Drill</Link> },
-            ],
-          },
-          {
-            key: 'wood-working',
-            label: 'Wood Working',
-            children: [
-              { key: 'circular-saw', label: <Link href="/product-category/power-tools/circular-saw">Circular Saw</Link> },
-              { key: 'jig-saw', label: <Link href="/product-category/power-tools/jig-saw">Jig Saw</Link> },
-              { key: 'mitter-saw', label: <Link href="/product-category/power-tools/mitter-saw">Mitter Saw</Link> },
-              { key: 'planner', label: <Link href="/product-category/power-tools/planner">Planner</Link> },
-              { key: 'router', label: <Link href="/product-category/power-tools/router">Router</Link> },
-              { key: 'sander', label: <Link href="/product-category/power-tools/sander">Sander</Link> },
-              { key: 'trimmer', label: <Link href="/product-category/power-tools/trimmer">Trimmer</Link> },
-              { key: 'band-saw', label: <Link href="/product-category/power-tools/band-saw">Band Saw</Link> },
-            ],
-          },
-          {
-            key: 'general-working',
-            label: 'General Working',
-            children: [
-              { key: 'blower', label: <Link href="/product-category/power-tools/blower">Blower</Link> },
-              { key: 'demolition-hammer', label: <Link href="/product-category/power-tools/demolition-hammer">Demolition Hammer</Link> },
-              { key: 'cordless', label: <Link href="/product-category/power-tools/cordless">Cordless</Link> },
-              { key: 'cordless-glue-gun', label: <Link href="/product-category/power-tools/cordless-glue-gun">Cordless Glue Gun</Link> },
-              { key: 'grass-trimmer', label: <Link href="/product-category/power-tools/grass-trimmer">Grass Trimmer</Link> },
-              { key: 'heat-gun', label: <Link href="/product-category/power-tools/heat-gun">Heat Gun</Link> },
-              { key: 'gun-polisher', label: <Link href="/product-category/power-tools/gun-polisher">Gun Polisher</Link> },
-              { key: 'marble-cutter', label: <Link href="/product-category/power-tools/marble-cutter">Marble Cutter</Link> },
-              { key: 'polisher', label: <Link href="/product-category/power-tools/polisher">Polisher</Link> },
-              { key: 'pressure-washer', label: <Link href="/product-category/power-tools/pressure-washer">Pressure Washer</Link> },
-              { key: 'rotary-hammer', label: <Link href="/product-category/power-tools/rotary-hammer">Rotary Hammer</Link> },
-              { key: 'spray-gun', label: <Link href="/product-category/power-tools/spray-gun">Spray Gun</Link> },
-              { key: 'vacum-cleaner', label: <Link href="/product-category/power-tools/vacum-cleaner">Vacum Cleaner</Link> },
-            ],
-          },
-        ],
-      },
-      {
-        key: 'welding',
-        label: 'Welding',
-        children: [{ key: 'inverter', label: <Link href="/product-category/welding/inverter">Inverter</Link> }],
-      },
-    ],
-  },
-  {
-    key: 'catalog',
-    label: (
-      <a 
-        href="/catalog/ryu-catalog.pdf" 
-        target="_blank" 
-        rel="noopener noreferrer"
-      >
-        View Catalog
-      </a>
-    ),
-  },
-  {
-    key: 'service-support',
-    label: (
-      <span>
-        Service & Support <span className={styles.arrowIcon} style={{ display: 'inline-block', width: 0, height: 0, borderLeft: '4px solid transparent', borderRight: '4px solid transparent', borderTop: '5px solid #1d1b1b', marginLeft: '4px' }}></span>
-      </span>
-    ),
-    children: [
-      { key: 'service-center', label: <Link href="/service-center">Service Center</Link> },
-      { key: 'where-to-buy', label: <Link href="/where-to-buy">Where To Buy</Link> },
-      { 
-        key: 'altama-ecare', 
-        label: (
-          <a 
-            href="https://play.google.com/store/apps/details?id=id.co.carepoint&pli=1" 
-            target="_blank" 
-            rel="noopener noreferrer"
-          >
-            Altama E Care
-          </a>
-        )
-      },
-      { key: 'contact', label: <Link href="/contact">Contact</Link> },
-      { key: 'warranty', label: <Link href="/warranty">Warranty</Link> },
-    ],
-  },
-];
+// Dropdown arrow icon component
+const DropdownArrow = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 320 512"
+    width={14}
+    height={14}
+    className="ml-1 text-xs hidden lg:inline"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path
+      fill="currentColor"
+      d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
+    />
+  </svg>
+);
 
 const Navbar: React.FC = () => {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { language, t, setLanguage } = useLanguage();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
-  const [language, setLanguage] = useState<'en' | 'id'>('en');
-  const [menuItems, setMenuItems] = useState<MenuProps['items']>(staticMenuItems);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryItems, setCategoryItems] = useState<MenuProps['items']>([]);
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
 
+  // Build menu items with translations
+  const menuItems = useMemo((): MenuProps['items'] => [
+    {
+      key: 'home',
+      label: <Link href="/">{t.nav.home}</Link>,
+    },
+    {
+      key: 'blog',
+      label: <Link href="/blog">{t.nav.blog}</Link>,
+    },
+    {
+      key: 'category',
+      label: (
+        <span className="flex items-center gap-1">
+          {t.nav.category}
+          <DropdownArrow />
+        </span>
+      ),
+      children: categoryItems,
+    },
+    {
+      key: 'catalog',
+      label: (
+        <a 
+          href="/catalog/ryu-catalog.pdf" 
+          target="_blank" 
+          rel="noopener noreferrer"
+        >
+          {t.nav.viewCatalog}
+        </a>
+      ),
+    },
+    {
+      key: 'service-support',
+      label: (
+        <span className="flex items-center gap-1">
+          {t.nav.serviceSupport}
+          <DropdownArrow />
+        </span>
+      ),
+      children: [
+        { key: 'service-center', label: <Link href="/service-center">{t.nav.serviceCenter}</Link> },
+        { key: 'where-to-buy', label: <Link href="/where-to-buy">{t.nav.whereToBuy}</Link> },
+        { 
+          key: 'altama-ecare', 
+          label: (
+            <a 
+              href="https://play.google.com/store/apps/details?id=id.co.carepoint&pli=1" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              {t.nav.altamaEcare}
+            </a>
+          )
+        },
+        { key: 'contact', label: <Link href="/contact">{t.nav.contact}</Link> },
+        { key: 'warranty', label: <Link href="/warranty">{t.nav.warranty}</Link> },
+      ],
+    },
+  ], [t, categoryItems]);
+
+  // Helper function to find menu key by pathname
+  const findMenuKeyByPath = (items: MenuProps['items'], path: string, parentKeys: string[] = []): { key: string | null; parents: string[] } => {
+    if (!items) return { key: null, parents: [] };
+    
+    for (const item of items) {
+      const menuItem = item as any;
+      if (menuItem.label && typeof menuItem.label === 'object') {
+        const href = menuItem.label.props?.href;
+        if (href && path === href) {
+          return { key: menuItem.key, parents: parentKeys };
+        }
+      }
+      
+      if (menuItem.children) {
+        const result = findMenuKeyByPath(menuItem.children, path, [...parentKeys, menuItem.key]);
+        if (result.key) return result;
+      }
+    }
+    
+    return { key: null, parents: [] };
+  };
+
+  // Update selected keys based on pathname
+  useEffect(() => {
+    if (pathname === '/') {
+      setSelectedKeys(['home']);
+    } else if (pathname.startsWith('/blog')) {
+      setSelectedKeys(['blog']);
+    } else if (pathname.startsWith('/service-center')) {
+      setSelectedKeys(['service-center']);
+    } else if (pathname.startsWith('/where-to-buy')) {
+      setSelectedKeys(['where-to-buy']);
+    } else if (pathname.startsWith('/contact')) {
+      setSelectedKeys(['contact']);
+    } else if (pathname.startsWith('/warranty')) {
+      setSelectedKeys(['warranty']);
+    } else if (pathname.startsWith('/product-category')) {
+      const result = findMenuKeyByPath(menuItems, pathname);
+      if (result.key) {
+        setSelectedKeys([result.key]);
+      } else {
+        setSelectedKeys([]);
+      }
+    } else {
+      setSelectedKeys([]);
+    }
+  }, [pathname, menuItems]);
+
+  // Fetch categories from database (no translation needed)
   useEffect(() => {
     (async () => {
       try {
         const categoryTree = await getPublicCategoryTree();
-        const dynamicMenuItems = buildMenuItems(categoryTree);
-        setMenuItems(dynamicMenuItems);
+        const items = buildCategoryMenu(categoryTree);
+        setCategoryItems(items);
       } catch (error) {
         console.error('Failed to load categories:', error);
-        // Keep static menu items on error
       }
     })();
   }, []);
-
-  const buildMenuItems = (categories: CategoryNode[]): MenuProps['items'] => {
-    const categoryItems = buildCategoryMenu(categories);
-    
-    // Insert categories into the menu structure
-    return [
-      staticMenuItems![0], // Home
-      staticMenuItems![1], // Blog
-      {
-        key: 'category',
-        label: (
-          <span>
-            Category <span className={styles.arrowIcon} style={{ display: 'inline-block', width: 0, height: 0, borderLeft: '4px solid transparent', borderRight: '4px solid transparent', borderTop: '5px solid #1d1b1b', marginLeft: '4px' }}></span>
-          </span>
-        ),
-        children: categoryItems,
-      },
-      staticMenuItems![3], // Catalog
-      staticMenuItems![4], // Service & Support
-    ];
-  };
 
   const buildCategoryMenu = (categories: CategoryNode[], parentPath: string = ''): MenuProps['items'] => {
     if (!categories || categories.length === 0) return [];
@@ -195,7 +169,7 @@ const Navbar: React.FC = () => {
     return categories.map((cat) => {
       const hasChildren = cat.children && cat.children.length > 0;
       const currentPath = parentPath ? `${parentPath}/${cat.slug}` : cat.slug;
-      const fullPath = `/product-category/category/${currentPath}`;
+      const fullPath = `/product-category/${currentPath}`;
       
       return {
         key: cat.id,
@@ -205,91 +179,158 @@ const Navbar: React.FC = () => {
     });
   };
 
-  const toggleDrawer = () => {
-    setDrawerVisible(!drawerVisible);
-  };
+  const toggleDrawer = () => setDrawerVisible(!drawerVisible);
+  const toggleSearch = () => setSearchVisible(!searchVisible);
 
-  const toggleSearch = () => {
-    setSearchVisible(!searchVisible);
-  };
-
-  const switchLanguage = (lang: 'en' | 'id') => {
+  const handleLanguageChange = (lang: Language) => {
     setLanguage(lang);
-    // Di sini bisa ditambahkan logic untuk mengubah bahasa di seluruh website
-    console.log('Language switched to:', lang);
   };
+
+  const handleSearch = (e?: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e && e.key !== 'Enter') return;
+    if (!searchQuery.trim()) return;
+
+    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    setSearchQuery('');
+    setSearchVisible(false);
+  };
+
+  const renderDesktopMenuItems = (items: MenuProps['items']): MenuProps['items'] => {
+    if (!items) return [];
+    
+    return items.map((item: any) => {
+      if (item.children && item.children.length > 0) {
+        return {
+          ...item,
+          children: renderDesktopMenuItems(item.children),
+        };
+      }
+      return item;
+    });
+  };
+
+  // Language switcher component
+  const LanguageSwitcher = () => (
+    <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-lg">
+      {languages.map((lang) => (
+        <button 
+          key={lang.code}
+          type="button" 
+          className={`w-9 h-8 rounded-md border-0 bg-transparent cursor-pointer flex items-center justify-center transition-all hover:bg-gray-200 hover:scale-105 ${
+            language === lang.code ? 'bg-white shadow-sm' : ''
+          }`}
+          onClick={() => handleLanguageChange(lang.code)}
+          aria-label={lang.name}
+        >
+          <img 
+            src={lang.flag} 
+            alt={lang.name} 
+            className="w-6 h-4 object-cover rounded-sm" 
+          />
+        </button>
+      ))}
+    </div>
+  );
 
   return (
-    <header className={styles.navbar}>
-      <div className={styles.navbarContent}>
-        <button className={styles.hamburger} onClick={toggleDrawer} aria-label="Menu">
-          <MenuOutlined style={{ fontSize: '24px' }} />
+    <header className="w-full bg-white shadow-md sticky top-0 z-[100]">
+      <div className="flex items-center justify-between gap-6 px-4 lg:px-8 py-3 max-w-[1400px] mx-auto">
+        {/* Hamburger Menu */}
+        <button 
+          className="lg:hidden flex items-center justify-center p-2 text-[#1d1b1b] hover:bg-gray-100 rounded transition-colors"
+          onClick={toggleDrawer} 
+          aria-label={t.common.menu}
+        >
+          <MenuOutlined className="text-2xl" />
         </button>
 
-        <Link href="/" className={styles.logo}>
+        {/* Logo */}
+        <Link href="/" className="flex items-center h-12 flex-1 lg:flex-none justify-center lg:justify-start">
           <Image
             src="/images/logo.png"
             alt="Ryu Power Tools"
             width={140}
             height={48}
             priority
-            className={styles.logoImg}
+            className="h-12 w-auto"
           />
         </Link>
 
-        <nav className={styles.navLinks}>
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex flex-1">
           <Menu
             mode="horizontal"
-            items={menuItems}
-            className={styles.antMenu}
-            defaultSelectedKeys={['home']}
+            items={renderDesktopMenuItems(menuItems)}
+            selectedKeys={selectedKeys}
+            className={styles.desktopMenu}
+            style={{ 
+              border: 'none',
+              background: 'transparent',
+              flex: 1,
+            }}
           />
         </nav>
 
-        <Space size={16} className={styles.actions}>
-          <button className={styles.searchBtn} onClick={toggleSearch} aria-label="Search">
-            <SearchOutlined style={{ fontSize: '20px' }} />
+        {/* Right Actions */}
+        <div className="flex items-center gap-3">
+          {/* Mobile Search Button */}
+          <button 
+            className="lg:hidden flex items-center justify-center p-2 text-[#1d1b1b] hover:bg-gray-100 rounded transition-colors"
+            onClick={toggleSearch} 
+            aria-label={t.common.search}
+          >
+            <SearchOutlined className="text-xl" />
           </button>
           
-          <Input
-            size="large"
-            allowClear
-            prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-            placeholder="Search Model, Product, etc"
-            className={styles.search}
-          />
-          
-          <div className={styles.langSwitch}>
-            <button 
-              type="button" 
-              className={`${styles.flagBtn} ${language === 'en' ? styles.flagBtnActive : ''}`}
-              onClick={() => switchLanguage('en')}
-              aria-label="English"
-            >
-              <img src="/images/flags/uk.png" alt="English" className={styles.flagImg} />
-            </button>
-            <button 
-              type="button" 
-              className={`${styles.flagBtn} ${language === 'id' ? styles.flagBtnActive : ''}`}
-              onClick={() => switchLanguage('id')}
-              aria-label="Bahasa Indonesia"
-            >
-              <img src="/images/flags/indonesia.png" alt="Indonesia" className={styles.flagImg} />
-            </button>
+          {/* Desktop Search */}
+            <div className="hidden lg:block">
+              <Input
+                size="large"
+                allowClear
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                prefix={<SearchOutlined className="text-gray-400" />}
+                suffix={searchQuery ? (<button onClick={() => handleSearch()} className="text-gray-400 hover:text-gray-600" type="button"><SearchOutlined /></button>) : null}
+                placeholder={t.nav.searchPlaceholder}
+                style={{
+                  borderRadius: '9999px',
+                  width: '240px'
+                }}
+              />
+            </div>
+
+          {/* Language Switcher - Desktop */}
+          <div className="hidden lg:block">
+            <LanguageSwitcher />
           </div>
-        </Space>
+        </div>
       </div>
 
       {/* Mobile Search Bar */}
       {searchVisible && (
-        <div className={styles.mobileSearch}>
+        <div className="lg:hidden px-4 py-3 border-t border-gray-200 bg-white">
           <Input
             size="large"
             allowClear
             autoFocus
-            prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-            placeholder="Search Model, Product, etc"
-            className={styles.mobileSearchInput}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={handleSearch}
+            prefix={<SearchOutlined className="text-gray-400" />}
+            suffix={
+              searchQuery ? (
+                <button
+                  onClick={() => handleSearch()}
+                  className="text-gray-400 hover:text-gray-600"
+                  type="button"
+                >
+                  <SearchOutlined />
+                </button>
+              ) : null
+            }
+            placeholder={t.nav.searchPlaceholder}
+            className="w-full rounded-full"
           />
         </div>
       )}
@@ -299,17 +340,16 @@ const Navbar: React.FC = () => {
         placement="left"
         onClose={toggleDrawer}
         open={drawerVisible}
-        className={styles.drawer}
         size={280}
-        closeIcon={<CloseOutlined style={{ fontSize: '20px', color: '#ffffff' }} />}
+        closeIcon={<CloseOutlined className="text-xl text-white" />}
         title={
-          <div className={styles.drawerHeader}>
+          <div className="flex items-center justify-start">
             <Image
               src="/images/logo.png"
               alt="Ryu Power Tools"
               width={100}
               height={36}
-              className={styles.drawerLogo}
+              className="h-9 w-auto"
             />
           </div>
         }
@@ -317,7 +357,8 @@ const Navbar: React.FC = () => {
           header: {
             background: '#2d6a2e',
             borderBottom: 'none',
-            padding: '16px 20px'
+            padding: '16px 20px',
+            color: '#ffffff'
           },
           body: {
             padding: '0',
@@ -327,38 +368,22 @@ const Navbar: React.FC = () => {
           }
         }}
       >
-        <div className={styles.drawerContent}>
+        <div className="flex-1 overflow-y-auto pt-2">
           <Menu
             mode="inline"
             items={menuItems}
-            className={styles.drawerMenu}
-            defaultSelectedKeys={['home']}
+            selectedKeys={selectedKeys}
             onClick={toggleDrawer}
+            className="border-0 bg-transparent"
           />
         </div>
         
-        <div className={styles.drawerFooter}>
-          <div className={styles.footerDivider}></div>
-          <div className={styles.langSwitchDrawer}>
-            <span className={styles.langLabel}>Language</span>
-            <div className={styles.langSwitch}>
-              <button 
-                type="button" 
-                className={`${styles.flagBtn} ${language === 'en' ? styles.flagBtnActive : ''}`}
-                onClick={() => switchLanguage('en')}
-                aria-label="English"
-              >
-                <img src="/images/flags/uk.png" alt="English" className={styles.flagImg} />
-              </button>
-              <button 
-                type="button" 
-                className={`${styles.flagBtn} ${language === 'id' ? styles.flagBtnActive : ''}`}
-                onClick={() => switchLanguage('id')}
-                aria-label="Bahasa Indonesia"
-              >
-                <img src="/images/flags/indonesia.png" alt="Indonesia" className={styles.flagImg} />
-              </button>
-            </div>
+        <div className="p-4 bg-white border-t border-gray-200">
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              {t.nav.language}
+            </span>
+            <LanguageSwitcher />
           </div>
         </div>
       </Drawer>

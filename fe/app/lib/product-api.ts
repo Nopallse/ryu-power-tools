@@ -4,6 +4,17 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000"
 
 export type ProductImage = {
   url: string;
+  imageUrl?: string;
+};
+
+const normalizeImage = (img: Partial<ProductImage> & Record<string, any>) => {
+  const raw = img?.url ?? img?.imageUrl;
+  const normalizedUrl = raw
+    ? raw.startsWith('http')
+      ? raw
+      : `${API_BASE}${raw}`
+    : '/images/product.jpg';
+  return { ...img, url: normalizedUrl } as ProductImage;
 };
 
 export type ProductCategory = {
@@ -42,10 +53,7 @@ export async function getProducts(token: string): Promise<Product[]> {
   // Convert relative image URLs to absolute URLs
   return products.map((product: Product) => ({
     ...product,
-    productImages: product.productImages.map((img) => ({
-      ...img,
-      url: img.url ? (img.url.startsWith('http') ? img.url : `${API_BASE}${img.url}`) : '/images/product.jpg',
-    })),
+    productImages: (product.productImages || []).map(normalizeImage),
   }));
 }
 
@@ -66,10 +74,7 @@ export async function getProductById(id: string, token: string): Promise<Product
   // Convert relative image URLs to absolute URLs
   return {
     ...product,
-    productImages: product.productImages.map((img: ProductImage) => ({
-      ...img,
-      url: img.url.startsWith('http') ? img.url : `${API_BASE}${img.url}`,
-    })),
+    productImages: (product.productImages || []).map(normalizeImage),
   };
 }
 
@@ -149,10 +154,7 @@ export async function getPublicLatestProducts(limit?: number): Promise<Product[]
   // Convert relative image URLs to absolute URLs
   return products.map((product: Product) => ({
     ...product,
-    productImages: product.productImages?.map((img: ProductImage) => ({
-      ...img,
-      url: img.url ? (img.url.startsWith('http') ? img.url : `${API_BASE}${img.url}`) : '/images/product.jpg',
-    })) || [],
+    productImages: (product.productImages || []).map(normalizeImage),
   }));
 }
 
@@ -169,10 +171,7 @@ export async function getPublicProductById(id: string): Promise<Product> {
   // Convert relative image URLs to absolute URLs
   return {
     ...product,
-    productImages: product.productImages?.map((img: ProductImage) => ({
-      ...img,
-      url: img.url ? (img.url.startsWith('http') ? img.url : `${API_BASE}${img.url}`) : '/images/product.jpg',
-    })) || [],
+    productImages: (product.productImages || []).map(normalizeImage),
   };
 }
 
@@ -189,10 +188,7 @@ export async function getPublicProductBySlug(slug: string): Promise<Product> {
   // Convert relative image URLs to absolute URLs
   return {
     ...product,
-    productImages: product.productImages?.map((img: ProductImage) => ({
-      ...img,
-      url: img.url ? (img.url.startsWith('http') ? img.url : `${API_BASE}${img.url}`) : '/images/product.jpg',
-    })) || [],
+    productImages: (product.productImages || []).map(normalizeImage),
   };
 }
 
@@ -209,10 +205,7 @@ export async function getPublicProductsByCategorySlug(slug: string): Promise<Pro
   // Convert relative image URLs to absolute URLs
   return products.map((product: Product) => ({
     ...product,
-    productImages: product.productImages?.map((img: ProductImage) => ({
-      ...img,
-      url: img.url ? (img.url.startsWith('http') ? img.url : `${API_BASE}${img.url}`) : '/images/product.jpg',
-    })) || [],
+    productImages: (product.productImages || []).map(normalizeImage),
   }));
 }
 
@@ -229,10 +222,7 @@ export async function searchPublicProducts(query: string): Promise<Product[]> {
   // Convert relative image URLs to absolute URLs
   return products.map((product: Product) => ({
     ...product,
-    productImages: product.productImages?.map((img: ProductImage) => ({
-      ...img,
-      url: img.url ? (img.url.startsWith('http') ? img.url : `${API_BASE}${img.url}`) : '/images/product.jpg',
-    })) || [],
+    productImages: (product.productImages || []).map(normalizeImage),
   }));
 }
 

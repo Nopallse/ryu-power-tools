@@ -1,60 +1,67 @@
+'use client';
+
 import React from 'react';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 
 const WarrantyPage = () => {
+  const { t } = useLanguage();
+  
   const items = [
     {
       key: '1',
       label: (
         <span className="text-xl font-bold text-[#2d5016]">
-          GENSET WARRANTY INFORMATION
+          {t.warranty.gensetTitle}
         </span>
       ),
       children: (
         <div className="space-y-6 text-gray-700 leading-relaxed">
           <div>
             <p className="font-semibold text-[#2d5016] mb-3">
-              Warranty Service valid for 1 year from the date of purchase with the following conditions:
+              {t.warranty.gensetConditions}
             </p>
             <ul className="list-none space-y-2 ml-4">
               <li>
-                <span className="font-semibold">a.</span> Send the warranty card to PO. Box 4040 JKT 11040 within 14 days from the date of purchase.
+                <span className="font-semibold">a.</span> {t.warranty.gensetSendCard}
               </li>
               <li>
-                <span className="font-semibold">b.</span> 50% discount for 3 months for Electric Spare Part (AVR, Rotor and Stator Switch) one time the same replacement.
+                <span className="font-semibold">b.</span> {t.warranty.gensetDiscount}
               </li>
             </ul>
           </div>
 
           <p>
-            Warranty only applies if there is damage as a result of production/manufacture's error or material error in RYU GENSET based on inspection of RYU Authorized Service Center.
+            {t.warranty.gensetApplies}
           </p>
 
           <div>
-            <p className="font-semibold text-[#2d5016] mb-3">Warranty does not apply:</p>
+            <p className="font-semibold text-[#2d5016] mb-3">
+              {t.warranty.gensetDoesNotApply}
+            </p>
             <ul className="list-none space-y-2 ml-4">
               <li>
-                <span className="font-semibold">a.</span> Warranty card is still in a state of blank (empty), model and serial number does not match the actual items.
+                <span className="font-semibold">a.</span> {t.warranty.gensetBlank}
               </li>
               <li>
-                <span className="font-semibold">b.</span> Warranty card is not completely filled out, no stamp/signature by the dealer/store and has not been received within 14 (fourteen) days by the RYU Authorized Service Center.
+                <span className="font-semibold">b.</span> {t.warranty.gensetNotFilled}
               </li>
               <li>
-                <span className="font-semibold">c.</span> Damaged due to improper usage, not according to the manual instructions.
+                <span className="font-semibold">c.</span> {t.warranty.gensetMisuse}
               </li>
               <li>
-                <span className="font-semibold">d.</span> Damage caused by user negligence and natural disasters.
+                <span className="font-semibold">d.</span> {t.warranty.gensetNegligence}
               </li>
               <li>
-                <span className="font-semibold">e.</span> Opening/disassembling or repairing by anyone other than an RYU Authorized Service Center.
+                <span className="font-semibold">e.</span> {t.warranty.gensetUnauthorized}
               </li>
               <li>
-                <span className="font-semibold">f.</span> Change/modify, or use accessories that are not in accordance with the application.
+                <span className="font-semibold">f.</span> {t.warranty.gensetModified}
               </li>
               <li>
-                <span className="font-semibold">g.</span> Wearing non-original parts or modified parts.
+                <span className="font-semibold">g.</span> {t.warranty.gensetNonOriginal}
               </li>
               <li>
-                <span className="font-semibold">h.</span> Warranty does not include replacement accessories, battery and oil.
+                <span className="font-semibold">h.</span> {t.warranty.gensetExcludes}
               </li>
             </ul>
           </div>
@@ -65,70 +72,76 @@ const WarrantyPage = () => {
       key: '2',
       label: (
         <span className="text-xl font-bold text-[#2d5016]">
-          POWERTOOLS WARRANTY INFORMATION
+          {t.warranty.powertoolsTitle}
         </span>
       ),
       children: (
         <div className="space-y-6 text-gray-700 leading-relaxed">
           <div>
-            <p className="font-semibold text-[#2d5016] mb-3">TERMS OF WARRANTY</p>
-            <p className="mb-3">Warranty applies with the following conditions:</p>
+            <p className="font-semibold text-[#2d5016] mb-3">
+              {t.warranty.powertoolsTerms}
+            </p>
+            <p className="mb-3">
+              {t.warranty.powertoolsApplies}
+            </p>
             <ul className="list-none space-y-2 ml-4">
               <li>
-                <span className="font-semibold">a.</span> Send the warranty card to PO. Box 4040 JKT 11040 within 14 days from the date of purchase.
+                <span className="font-semibold">a.</span> {t.warranty.powertoolsSendCard}
               </li>
               <li>
-                <span className="font-semibold">b.</span> Warranty for 6 (six) months from the date of purchase in the form of spare part replacement (one-time reparation).
+                <span className="font-semibold">b.</span> {t.warranty.powertoolsDuration}
               </li>
               <li>
-                <span className="font-semibold">c.</span> 40% discount of the same spare part for one-time repair (during the warranty period).
+                <span className="font-semibold">c.</span> {t.warranty.powertoolsDiscount}
               </li>
               <li>
-                <span className="font-semibold">d.</span> Lifetime warranty service.
+                <span className="font-semibold">d.</span> {t.warranty.powertoolsLifetime}
               </li>
             </ul>
           </div>
 
           <p>
-            Warranty only applies if there is damage as a result of production/manufacture's error or material error in RYU POWERTOOLS based on inspection of RYU Authorized Service Center.
+            {t.warranty.powertoolsValidOnly}
           </p>
 
           <div>
-            <p className="font-semibold text-[#2d5016] mb-3">Warranty does not apply:</p>
+            <p className="font-semibold text-[#2d5016] mb-3">
+              {t.warranty.powertoolsDoesNotApply}
+            </p>
             <ul className="list-none space-y-2 ml-4">
               <li>
-                <span className="font-semibold">a.</span> Warranty card is still in a state of blank (empty), model and serial number does not match the actual items.
+                <span className="font-semibold">a.</span> {t.warranty.powertoolsBlank}
               </li>
               <li>
-                <span className="font-semibold">b.</span> Warranty card is not completely filled out, no stamp/signature by the dealer/store and has not been received within 14 (fourteen) days by the RYU Authorized Service Center.
+                <span className="font-semibold">b.</span> {t.warranty.powertoolsNotFilled}
               </li>
               <li>
-                <span className="font-semibold">c.</span> Damaged due to improper usage, not according to the manual instructions.
+                <span className="font-semibold">c.</span> {t.warranty.powertoolsMisuse}
               </li>
               <li>
-                <span className="font-semibold">d.</span> Damage caused by user negligence and natural disasters.
+                <span className="font-semibold">d.</span> {t.warranty.powertoolsNegligence}
               </li>
               <li>
-                <span className="font-semibold">e.</span> Opening/disassembling or repairing by anyone other than an RYU Authorized Service Center.
+                <span className="font-semibold">e.</span> {t.warranty.powertoolsUnauthorized}
               </li>
               <li>
-                <span className="font-semibold">f.</span> Change/modify, or use accessories that are not in accordance with the application.
+                <span className="font-semibold">f.</span> {t.warranty.powertoolsModified}
               </li>
               <li>
-                <span className="font-semibold">g.</span> Wearing non-original parts or modified parts.
+                <span className="font-semibold">g.</span> {t.warranty.powertoolsNonOriginal}
               </li>
               <li>
-                <span className="font-semibold">h.</span> Warranty does not apply for spare parts: Carbon Brush, Power Cable, Drill Chuck, Battery, and Accessories.
+                <span className="font-semibold">h.</span> {t.warranty.powertoolsExcludes}
               </li>
             </ul>
           </div>
 
           <p className="font-semibold">
-            RYU Authorized Service Center reserves the right to decide and determine to accept or reject the claim without any appeal from the buyer.
+            {t.warranty.powertoolsReserves}
           </p>
 
           <p className="font-semibold">
-            RYU POWERTOOLS shipping costs borne by the buyer.
+            {t.warranty.powertoolsShipping}
           </p>
         </div>
       ),
@@ -137,65 +150,71 @@ const WarrantyPage = () => {
       key: '3',
       label: (
         <span className="text-xl font-bold text-[#2d5016]">
-          INVERTER WARRANTY INFORMATION
+          {t.warranty.inverterTitle}
         </span>
       ),
       children: (
         <div className="space-y-6 text-gray-700 leading-relaxed">
           <div>
             <p className="font-semibold text-[#2d5016] mb-3">
-              Warranty Service valid for 1 year from the date of purchase with the following conditions:
+              {t.warranty.inverterConditions}
             </p>
             <ul className="list-none space-y-2 ml-4">
               <li>
-                <span className="font-semibold">a.</span> Send the warranty card to PO. Box 4040 JKT 11040 within 14 days from the date of purchase.
+                <span className="font-semibold">a.</span> {t.warranty.inverterSendCard}
               </li>
               <li>
-                <span className="font-semibold">b.</span> Warranty is valid for 2 (two) years from the date of purchase.
+                <span className="font-semibold">b.</span> {t.warranty.inverterValid}
                 <ul className="list-none space-y-1 ml-6 mt-2">
-                  <li>– First year warranty of free spare parts replacement.</li>
-                  <li>– The next one year warranty, get 40% discount for spare parts.</li>
+                  <li>
+                    – {t.warranty.inverterFirstYear}
+                  </li>
+                  <li>
+                    – {t.warranty.inverterSecondYear}
+                  </li>
                 </ul>
               </li>
               <li>
-                <span className="font-semibold">c.</span> Lifetime warranty service.
+                <span className="font-semibold">c.</span> {t.warranty.inverterLifetime}
               </li>
             </ul>
           </div>
 
           <p>
-            Warranty only applies if there is damage as a result of production/manufacture's error or material error in RYU INVERTER based on inspection of RYU Authorized Service Center.
+            {t.warranty.inverterApplies}
           </p>
 
           <div>
-            <p className="font-semibold text-[#2d5016] mb-3">Warranty does not apply:</p>
+            <p className="font-semibold text-[#2d5016] mb-3">
+              {t.warranty.inverterDoesNotApply}
+            </p>
             <ul className="list-none space-y-2 ml-4">
               <li>
-                <span className="font-semibold">a.</span> Warranty card is still in a state of blank (empty), model and serial number does not match the actual items.
+                <span className="font-semibold">a.</span> {t.warranty.inverterBlank}
               </li>
               <li>
-                <span className="font-semibold">b.</span> Warranty card is not completely filled out, no stamp/signature by the dealer/store and has not been received within 14 (fourteen) days by the RYU Authorized Service Center.
+                <span className="font-semibold">b.</span> {t.warranty.inverterNotFilled}
               </li>
               <li>
-                <span className="font-semibold">c.</span> Damaged due to improper usage, not according to the manual instructions.
+                <span className="font-semibold">c.</span> {t.warranty.inverterMisuse}
               </li>
               <li>
-                <span className="font-semibold">d.</span> Damage caused by user negligence and natural disasters.
+                <span className="font-semibold">d.</span> {t.warranty.inverterNegligence}
               </li>
               <li>
-                <span className="font-semibold">e.</span> Opening/disassembling or repairing by anyone other than an RYU Authorized Service Center.
+                <span className="font-semibold">e.</span> {t.warranty.inverterUnauthorized}
               </li>
               <li>
-                <span className="font-semibold">f.</span> Change/modify, or use accessories that are not in accordance with the application.
+                <span className="font-semibold">f.</span> {t.warranty.inverterModified}
               </li>
               <li>
-                <span className="font-semibold">g.</span> Wearing non-original parts or modified parts.
+                <span className="font-semibold">g.</span> {t.warranty.inverterNonOriginal}
               </li>
             </ul>
           </div>
 
           <p className="font-semibold">
-            RYU Authorized Service Center reserves the right to decide and determine to accept or reject the claim without any appeal from the buyer.
+            {t.warranty.inverterReserves}
           </p>
         </div>
       ),
@@ -204,30 +223,30 @@ const WarrantyPage = () => {
   return (
     <div className="bg-white py-20">
       <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
-        <h1 className="text-4xl sm:text-5xl font-bold text-[#2d5016] text-center underline mb-4">
-          GENERAL WARRANTY INFORMATION
-        </h1>
+        <h2 className="text-4xl lg:text-5xl font-bold text-[#2d6a2e] mb-4 underline text-center">
+          {t.warranty.pageTitle}
+        </h2>
         <p className="text-center text-gray-600 mb-12 text-lg">
-          Please review the warranty terms for your product category below
+          {t.warranty.pageSubtitle}
         </p>
 
-        <div className="space-y-8">
+        <div className="space-y-8 mb-12">
           {items.map((item) => (
-            <div key={item.key} className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
+            <div key={item.key} className="bg-white ">
               <div className="mb-4">{item.label}</div>
               <div>{item.children}</div>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 p-6 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-center text-gray-700 text-sm">
-            For warranty claims and inquiries, please contact your nearest{' '}
-            <a href="/service-center" className="text-[#2d5016] font-semibold hover:underline">
-              RYU Authorized Service Center
-            </a>
-            .
-          </p>
+        <div className="flex justify-center">
+          <button
+            type="button"
+            className="px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
+            onClick={() => (window.location.href = '/contact')}
+          >
+            {t.warranty.contactUs}
+          </button>
         </div>
       </div>
     </div>

@@ -4,8 +4,8 @@ import { ConfigProvider, App as AntdApp } from 'antd';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import './globals.css';
 import theme from './theme/themeConfig';
-import LayoutWrapper from '@/app/components/LayoutWrapper';
 import ScrollToTop from '@/app/components/ScrollToTop';
+import { LanguageProvider } from '@/app/providers/LanguageProvider';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -23,11 +23,13 @@ const RootLayout = ({ children }: React.PropsWithChildren) => (
   <html lang="en" className={`${poppins.variable} ${anton.variable}`} suppressHydrationWarning>
     <body suppressHydrationWarning>
       <AntdRegistry>
-        <ConfigProvider theme={theme}>
-          <AntdApp>
-            {children}
-          </AntdApp>
-        </ConfigProvider>
+        <LanguageProvider>
+          <ConfigProvider theme={theme}>
+            <AntdApp>
+              {children}
+            </AntdApp>
+          </ConfigProvider>
+        </LanguageProvider>
       </AntdRegistry>
     </body>
   </html>

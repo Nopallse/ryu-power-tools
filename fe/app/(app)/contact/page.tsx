@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react';
 import { Input, Select } from 'antd';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 
 const { TextArea } = Input;
 const { Option } = Select;
 
 const ContactPage = () => {
+  const { t } = useLanguage();
   const [generalForm, setGeneralForm] = useState({
     type: 'Customer Care',
     name: '',
@@ -43,42 +45,40 @@ const ContactPage = () => {
         {/* General Contact Section */}
         <div className="mb-20">
           <h1 className="text-3xl sm:text-4xl font-bold text-primary text-center">
-            CONTACT US
+            {t.contact.title.toUpperCase()}
           </h1>
 
-          <div className="bg-white rounded-lg p-4 mb-8">
+            <div className="bg-white rounded-lg p-4 mb-8">
             <p className="text-center text-[#324A6D] text-sm mb-6">
-              For all inquiries, please feel free to reach out at:
+              {t.contact.forInquiries}
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'center', color: '#324A6D', fontSize: '0.875rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-              <a
+            <div className="flex flex-col gap-4 text-center text-[#324A6D] text-sm sm:text-base">
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-8 flex-wrap">
+                <a
                 href="https://api.whatsapp.com/send?phone=6287777000966"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#324A6D', fontWeight: '600', transition: 'color 0.3s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#72bd5a')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#324A6D')}
-              >
-                Whatsapp Customer Care +6287 7770 00966
-              </a>
-              <span>|</span>
+                className="font-semibold transition-colors hover:!text-[#72bd5a] break-all"
+                style={{ color: '#324A6D' }}
+                >
+                {t.contact.whatsappCustomerCare}
+                </a>
+              <span className="hidden sm:inline">|</span>
               <a
                 href="tel:62216680180"
-                style={{ color: '#324A6D', fontWeight: '600', transition: 'color 0.3s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#72bd5a')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#324A6D')}
+                className="font-semibold transition-colors hover:!text-[#72bd5a] break-all"
+                style={{ color: '#324A6D' }}
               >
-                Phone Number (021) 6680180
+                {t.contact.phoneNumber}
               </a>
               </div>
             </div>
-          </div>
+            </div>
 
           <form onSubmit={handleGeneralSubmit} className="space-y-5 max-w-2xl mx-auto">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contact Type
+                {t.contact.contactType}
               </label>
               <Select
                 value={generalForm.type}
@@ -86,19 +86,19 @@ const ContactPage = () => {
                 size="large"
                 className="w-full"
               >
-                <Option value="Customer Care">Customer Care</Option>
-                <Option value="Distributor">Distributor</Option>
-                <Option value="Reseller">Reseller</Option>
+                <Option value="Customer Care">{t.contact.customerCare}</Option>
+                <Option value="Distributor">{t.contact.distributor}</Option>
+                <Option value="Reseller">{t.contact.reseller}</Option>
               </Select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Name *
+                {t.contact.name} *
               </label>
               <Input
                 size="large"
-                placeholder="Name"
+                placeholder={t.contact.name}
                 value={generalForm.name}
                 onChange={(e) => setGeneralForm({ ...generalForm, name: e.target.value })}
                 required
@@ -107,11 +107,11 @@ const ContactPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone *
+                {t.contact.phone} *
               </label>
               <Input
                 size="large"
-                placeholder="Phone"
+                placeholder={t.contact.phone}
                 value={generalForm.phone}
                 onChange={(e) => setGeneralForm({ ...generalForm, phone: e.target.value })}
                 required
@@ -120,12 +120,12 @@ const ContactPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email *
+                {t.contact.email} *
               </label>
               <Input
                 size="large"
                 type="email"
-                placeholder="Email"
+                placeholder={t.contact.email}
                 value={generalForm.email}
                 onChange={(e) => setGeneralForm({ ...generalForm, email: e.target.value })}
                 required
@@ -134,11 +134,11 @@ const ContactPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                City *
+                {t.common.city} *
               </label>
               <Input
                 size="large"
-                placeholder="City"
+                placeholder={t.common.city}
                 value={generalForm.city}
                 onChange={(e) => setGeneralForm({ ...generalForm, city: e.target.value })}
                 required
@@ -147,11 +147,11 @@ const ContactPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Message *
+                {t.contact.message} *
               </label>
               <TextArea
                 rows={4}
-                placeholder="Message"
+                placeholder={t.contact.message}
                 value={generalForm.message}
                 onChange={(e) => setGeneralForm({ ...generalForm, message: e.target.value })}
                 required
@@ -160,33 +160,15 @@ const ContactPage = () => {
             </div>
 
             <p className="text-sm text-gray-600">
-              This site is protected by reCAPTCHA and the Google{' '}
-              <a
-                href="https://policies.google.com/privacy"
-                target="_blank"
-                rel="noopener"
-                className="text-[#2d5016] hover:underline"
-              >
-                Privacy Policy
-              </a>{' '}
-              and{' '}
-              <a
-                href="https://policies.google.com/terms"
-                target="_blank"
-                rel="noopener"
-                className="text-[#2d5016] hover:underline"
-              >
-                Terms of Service
-              </a>{' '}
-              apply.
+              {t.contact.recaptchaNotice}
             </p>
 
-            <div className="flex justify-end">
+            <div className="flex justify-center sm:justify-end">
               <button
                 type="submit"
-                className="px-8 sm:px-10 py-1 sm:py-1.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base font-semibold tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
+                className="px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
               >
-                Send
+                {t.contact.send}
               </button>
             </div>
           </form>
@@ -194,14 +176,14 @@ const ContactPage = () => {
 
         {/* Event Contact Section */}
         <div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-[#2d5016] text-center underline mb-8">
-            CONTACT US FOR EVENT
+          <h1 className="text-3xl sm:text-4xl font-bold text-primary text-center">
+            {t.contact.contactEventTitle}
           </h1>
 
           <form onSubmit={handleEventSubmit} className="space-y-5 max-w-2xl mx-auto">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Event Type
+                {t.contact.eventType}
               </label>
               <Select
                 value={eventForm.type}
@@ -209,18 +191,18 @@ const ContactPage = () => {
                 size="large"
                 className="w-full"
               >
-                <Option value="OFFLINE">OFFLINE</Option>
-                <Option value="ONLINE">ONLINE</Option>
+                <Option value="OFFLINE">{t.contact.offline}</Option>
+                <Option value="ONLINE">{t.contact.online}</Option>
               </Select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Name *
+                {t.contact.name} *
               </label>
               <Input
                 size="large"
-                placeholder="Name"
+                placeholder={t.contact.name}
                 value={eventForm.name}
                 onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
                 required
@@ -229,11 +211,11 @@ const ContactPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone *
+                {t.contact.phone} *
               </label>
               <Input
                 size="large"
-                placeholder="Phone"
+                placeholder={t.contact.phone}
                 value={eventForm.phone}
                 onChange={(e) => setEventForm({ ...eventForm, phone: e.target.value })}
                 required
@@ -242,12 +224,12 @@ const ContactPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email *
+                {t.contact.email} *
               </label>
               <Input
                 size="large"
                 type="email"
-                placeholder="Email"
+                placeholder={t.contact.email}
                 value={eventForm.email}
                 onChange={(e) => setEventForm({ ...eventForm, email: e.target.value })}
                 required
@@ -256,11 +238,11 @@ const ContactPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                City *
+                {t.common.city} *
               </label>
               <Input
                 size="large"
-                placeholder="City"
+                placeholder={t.common.city}
                 value={eventForm.city}
                 onChange={(e) => setEventForm({ ...eventForm, city: e.target.value })}
                 required
@@ -269,11 +251,11 @@ const ContactPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Message *
+                {t.contact.message} *
               </label>
               <TextArea
                 rows={4}
-                placeholder="Message"
+                placeholder={t.contact.message}
                 value={eventForm.message}
                 onChange={(e) => setEventForm({ ...eventForm, message: e.target.value })}
                 required
@@ -282,33 +264,15 @@ const ContactPage = () => {
             </div>
 
             <p className="text-sm text-gray-600">
-              This site is protected by reCAPTCHA and the Google{' '}
-              <a
-                href="https://policies.google.com/privacy"
-                target="_blank"
-                rel="noopener"
-                className="text-[#2d5016] hover:underline"
-              >
-                Privacy Policy
-              </a>{' '}
-              and{' '}
-              <a
-                href="https://policies.google.com/terms"
-                target="_blank"
-                rel="noopener"
-                className="text-[#2d5016] hover:underline"
-              >
-                Terms of Service
-              </a>{' '}
-              apply.
+              {t.contact.recaptchaNotice}
             </p>
 
-            <div className="flex justify-end">
+            <div className="flex justify-center sm:justify-end">
               <button
                 type="submit"
-                className="px-8 sm:px-10 py-1 sm:py-1.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base font-semibold tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
+                className="px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
               >
-                Send
+                {t.contact.send}
               </button>
             </div>
           </form>

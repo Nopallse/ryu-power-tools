@@ -4,9 +4,11 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Spin, Empty } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 import type { Category } from '@/app/lib/category-api';
 
 export default function FeaturedSection() {
+  const { t } = useLanguage();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +61,7 @@ export default function FeaturedSection() {
       <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
         <div className="text-center mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4 underline decoration-2 underline-offset-4">
-            FEATURED PRODUCTS
+            {t.home.featuredTitle}
           </h2>
         </div>
 
@@ -84,14 +86,14 @@ export default function FeaturedSection() {
                     {category.name}
                   </h3>
                   <p className="text-sm text-[#324A6D] leading-relaxed">
-                    {category.description || `Explore our ${category.name} collection for high-quality products and solutions.`}
+                    {category.description || t.home.featuredPlaceholder.replace('{category}', category.name)}
                   </p>
                 </div>
               ))}
             </div>
           ) : (
             <Empty 
-              description="No categories available" 
+              description={t.home.noCategories} 
               style={{ marginTop: '60px', marginBottom: '60px' }}
             />
           )}

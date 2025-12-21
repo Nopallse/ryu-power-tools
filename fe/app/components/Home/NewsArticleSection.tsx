@@ -4,10 +4,12 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Spin, Empty } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 import type { Article } from '@/app/lib/article-api';
 import dayjs from 'dayjs';
 
 export default function NewsArticleSection() {
+  const { t } = useLanguage();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -66,8 +68,8 @@ export default function NewsArticleSection() {
         {/* NEWS & ARTICLE */}
         <div className="mb-24">
           <div className="text-center mb-16">
-            <h2 className="text-xl lg:text-2xl font-bold text-primary underline decoration-2 underline-offset-4">
-              NEWS & ARTICLE
+          <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4 underline decoration-2 underline-offset-4">
+              {t.home.newsTitle}
             </h2>
           </div>
 
@@ -103,7 +105,7 @@ export default function NewsArticleSection() {
               </div>
             ) : (
               <Empty 
-                description="No articles available" 
+                description={t.home.noArticles}
                 style={{ marginTop: '60px', marginBottom: '60px' }}
               />
             )}
@@ -111,7 +113,7 @@ export default function NewsArticleSection() {
         </div>
 
         <div className="text-center mb-16">
-          <h2 className="text-lg lg:text-xl font-bold text-primary underline decoration-2 underline-offset-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4 underline decoration-2 underline-offset-4">
             BLOGS
           </h2>
         </div>

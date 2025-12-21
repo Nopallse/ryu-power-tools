@@ -130,11 +130,11 @@ export default function CategoriesPage() {
         formData.append('parentId', values.parentId);
       }
 
-      // Handle file upload
+      // Handle file upload (API expects field name `file`)
       if (fileList.length > 0) {
         const file = fileList[0];
         if (file.originFileObj) {
-          formData.append('image', file.originFileObj);
+          formData.append('file', file.originFileObj);
         }
       }
 

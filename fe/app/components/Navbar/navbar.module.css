@@ -1,450 +1,179 @@
-.navbar {
-  width: 100%;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+/* Desktop Menu with Ant Design */
+:global(.ant-menu-horizontal) {
+  line-height: 48px;
 }
 
-.navbarContent {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 12px 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-  
-}
-
-.logo {
-  display: inline-flex;
-  align-items: center;
-  height: 48px;
-}
-
-.logoImg {
-  height: 48px;
-  width: auto;
-}
-
-.navLinks {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-weight: 700;
-  font-size: 15px;
-  color: #1a1a1a;
-  flex: 1;
-}
-
-.antMenu {
-  flex: 1;
-  border-bottom: none !important;
-  background: transparent;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.04em;
-}
-
-.antMenu :global(.ant-menu-item),
-.antMenu :global(.ant-menu-submenu-title) {
-  text-transform: uppercase;
-  color: #1d1b1b !important;
+:global(.ant-menu-horizontal > .ant-menu-item),
+:global(.ant-menu-horizontal > .ant-menu-submenu) {
+  border-bottom: 3px solid transparent !important;
   padding: 0 12px !important;
-  height: auto !important;
-  line-height: 1.5 !important;
-  border-bottom: none !important;
-}
-
-.antMenu :global(.ant-menu-item-selected) {
-  background-color: transparent !important;
-  color: #3f444b !important;
-  border-bottom: none !important;
-}
-
-.antMenu :global(.ant-menu-item::after) {
-  display: none !important;
-}
-
-.antMenu :global(.ant-menu-submenu-title::after) {
-  display: none !important;
-}
-
-.antMenu :global(.ant-menu-submenu > .ant-menu-submenu-title:hover) {
-  color: #3f444b !important;
-}
-
-.antMenu :global(.ant-menu-item:hover),
-.antMenu :global(.ant-menu-submenu-title:hover) {
-  color: #3f444b !important;
-}
-
-.antMenu :global(.ant-menu-submenu-popup) {
-  background: #ffffff !important;
-}
-
-.antMenu :global(.ant-menu-vertical .ant-menu-item),
-.antMenu :global(.ant-menu-vertical .ant-menu-submenu-title) {
-  padding-left: 12px !important;
-  padding-right: 12px !important;
-}
-
-.antMenu :global(.ant-menu-submenu-arrow) {
-  color: #3f444b !important;
-}
-
-.actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.search {
-  width: clamp(240px, 32vw, 520px);
-  border-radius: 999px;
-  padding-inline: 14px 18px;
-}
-
-.langSwitch {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #f5f5f5;
-  padding: 4px;
-  border-radius: 8px;
-}
-
-.flagBtn {
-  width: 36px;
-  height: 32px;
-  border-radius: 6px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.flagBtn:hover {
-  background: rgba(0, 0, 0, 0.05);
-  transform: scale(1.05);
-}
-
-.flagBtnActive {
-  background: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.flagImg {
-  width: 24px;
-  height: 16px;
-  object-fit: cover;
-  border-radius: 2px;
-}
-
-.hamburger {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  color: #1d1b1b;
-  align-items: center;
-  justify-content: center;
-}
-
-.searchBtn {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  color: #1d1b1b;
-  align-items: center;
-  justify-content: center;
-}
-
-.mobileSearch {
-  display: none;
-  padding: 12px 16px;
-  border-top: 1px solid #e8e8e8;
-  background: #ffffff;
-}
-
-.mobileSearchInput {
-  width: 100%;
-  border-radius: 999px;
-}
-
-.drawer :global(.ant-drawer-header) {
-  background: #2d6a2e;
-  color: #ffffff;
-  border-bottom: none;
-  padding: 16px 20px;
-}
-
-.drawer :global(.ant-drawer-body) {
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.drawer :global(.ant-drawer-content-wrapper) {
-  width: 280px !important;
-  max-width: 85vw !important;
-}
-
-.drawer :global(.ant-drawer-title) {
-  color: #ffffff !important;
-  font-weight: 600;
-}
-
-.drawer :global(.ant-drawer-close) {
-  color: #ffffff !important;
-}
-
-.drawerHeader {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.drawerLogo {
-  height: 36px;
-  width: auto;
-}
-
-.drawerContent {
-  flex: 1;
-  overflow-y: auto;
-  padding-top: 8px;
-}
-
-.drawerContent::-webkit-scrollbar {
-  width: 6px;
-}
-
-.drawerContent::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.drawerContent::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 3px;
-}
-
-.drawerContent::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-.arrowIcon {
-  display: inline-block !important;
-}
-
-@media (max-width: 992px) {
-  .arrowIcon {
-    display: none !important;
-  }
-}
-
-.drawerMenu {
-  border-right: none !important;
-  background: transparent !important;
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.02em;
-}
-
-.drawerMenu :global(.ant-menu-item),
-.drawerMenu :global(.ant-menu-submenu-title) {
-  padding-left: 20px !important;
-  padding-right: 12px !important;
-  text-transform: none;
-  letter-spacing: 0.02em;
   margin: 0 !important;
-  height: auto !important;
-  line-height: 2.2 !important;
-  border-bottom: none !important;
-  color: #2c2c2c !important;
-  font-weight: 500 !important;
+  font-weight: 700 !important;
   font-size: 14px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: #000000 !important;
   transition: all 0.2s ease !important;
 }
 
-.drawerMenu :global(.ant-menu-item) {
-  font-weight: 500 !important;
+:global(.ant-menu-horizontal > .ant-menu-item:hover),
+:global(.ant-menu-horizontal > .ant-menu-submenu:hover),
+:global(.ant-menu-horizontal > .ant-menu-item-selected),
+:global(.ant-menu-horizontal > .ant-menu-submenu-selected) {
+  color: #2a6932 !important;
 }
 
-.drawerMenu :global(.ant-menu-submenu-title) {
-  font-weight: 600 !important;
+:global(.ant-menu-horizontal > .ant-menu-item::after),
+:global(.ant-menu-horizontal > .ant-menu-submenu::after) {
+  display: none !important;
 }
 
-/* Hover state */
-.drawerMenu :global(.ant-menu-item:hover),
-.drawerMenu :global(.ant-menu-submenu-title:hover) {
-  background-color: #f5f5f5 !important;
-  color: #2d6a2e !important;
+/* Submenu dropdown styling */
+:global(.ant-menu-submenu-popup) {
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Selected state */
-.drawerMenu :global(.ant-menu-item-selected) {
-  background-color: #e8f4e9 !important;
-  color: #2d6a2e !important;
-  font-weight: 600 !important;
+:global(.ant-menu-submenu-popup .ant-menu-item),
+:global(.ant-menu-submenu-popup .ant-menu-submenu-title) {
+  color: #1b1b1b !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  text-transform: uppercase !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Sub-menu styling - Level 1 */
-.drawerMenu :global(.ant-menu-sub) {
-  background: transparent !important;
-  border: none !important;
+:global(.ant-menu-submenu-popup .ant-menu-item:hover),
+:global(.ant-menu-submenu-popup .ant-menu-submenu-title:hover) {
+  background: #3f444b !important;
+  color: #61ce70 !important;
 }
 
-.drawerMenu :global(.ant-menu-sub .ant-menu-item),
-.drawerMenu :global(.ant-menu-sub .ant-menu-submenu-title) {
-  padding-left: 40px !important;
-  padding-right: 12px !important;
-  height: auto !important;
-  line-height: 2 !important;
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.02em !important;
-  color: #2c2c2c !important;
+:global(.ant-menu-submenu-popup .ant-menu-item-selected) {
+  background: #3f444b !important;
+  color: #61ce70 !important;
 }
 
-.drawerMenu :global(.ant-menu-sub .ant-menu-submenu-title) {
-  font-weight: 600 !important;
+:global(.ant-menu-submenu-popup .ant-menu-item-selected a) {
+  color: #61ce70 !important;
 }
 
-.drawerMenu :global(.ant-menu-sub .ant-menu-item:hover),
-.drawerMenu :global(.ant-menu-sub .ant-menu-submenu-title:hover) {
-  background-color: #f5f5f5 !important;
-  color: #2d6a2e !important;
+:global(.ant-menu-submenu-popup .ant-menu-item:last-child),
+:global(.ant-menu-submenu-popup .ant-menu-submenu:last-child .ant-menu-submenu-title) {
+  border-bottom: none !important;
 }
 
-.drawerMenu :global(.ant-menu-sub .ant-menu-item-selected) {
-  background-color: #e8f4e9 !important;
-  color: #2d6a2e !important;
-}
-
-/* Sub-sub-menu styling - Level 2 */
-.drawerMenu :global(.ant-menu-sub .ant-menu-sub) {
-  background: transparent !important;
-  border: none !important;
-}
-
-.drawerMenu :global(.ant-menu-sub .ant-menu-sub .ant-menu-item),
-.drawerMenu :global(.ant-menu-sub .ant-menu-sub .ant-menu-submenu-title) {
-  padding-left: 60px !important;
-  padding-right: 12px !important;
-  height: auto !important;
-  line-height: 1.8 !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.02em !important;
-  color: #2c2c2c !important;
-}
-
-.drawerMenu :global(.ant-menu-sub .ant-menu-sub .ant-menu-item:hover),
-.drawerMenu :global(.ant-menu-sub .ant-menu-sub .ant-menu-submenu-title:hover) {
-  background-color: #f5f5f5 !important;
-  color: #2d6a2e !important;
-}
-
-.drawerMenu :global(.ant-menu-sub .ant-menu-sub .ant-menu-item-selected) {
-  background-color: #e8f4e9 !important;
-  color: #2d6a2e !important;
-}
-
-/* Arrow styling */
-.drawerMenu :global(.ant-menu-submenu-arrow) {
-  color: #2d6a2e !important;
-  transition: transform 0.3s ease !important;
-}
-
-.drawerMenu :global(.ant-menu-submenu-open > .ant-menu-submenu-title > .ant-menu-submenu-arrow) {
-  color: #2d6a2e !important;
-  transform: rotate(180deg) !important;
-}
-
-.drawerMenu :global(.ant-menu-submenu-open > .ant-menu-submenu-title) {
-  color: #2d6a2e !important;
-  font-weight: 600 !important;
+/* Remove default Ant Design menu item selected background */
+:global(.ant-menu-item-selected) {
   background-color: transparent !important;
 }
 
-.drawerFooter {
-  padding: 16px 20px;
-  background: #ffffff;
-  border-top: 1px solid #e8e8e8;
+:global(.ant-menu-submenu-selected) {
+  background-color: transparent !important;
 }
 
-.footerDivider {
-  height: 1px;
-  background: #e8e8e8;
-  margin-bottom: 16px;
-  display: none;
+/* Links inside menu items */
+:global(.ant-menu-item a),
+:global(.ant-menu-submenu-title a) {
+  color: inherit !important;
+  text-decoration: none !important;
 }
 
-.langSwitchDrawer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+/* Mobile/Inline Menu Styling */
+:global(.ant-menu-inline .ant-menu-item),
+:global(.ant-menu-inline .ant-menu-submenu-title) {
+  color: #1b1b1b !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  height: auto !important;
 }
 
-.langLabel {
-  font-size: 12px;
-  font-weight: 600;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+:global(.ant-menu-inline .ant-menu-item:hover),
+:global(.ant-menu-inline .ant-menu-submenu-title:hover) {
+  background: #3f444b !important;
+  color: #61ce70 !important;
 }
 
-@media (max-width: 992px) {
-  .hamburger {
-    display: flex;
-  }
+:global(.ant-menu-inline .ant-menu-item-selected) {
+  background: #3f444b !important;
+  color: #61ce70 !important;
+}
 
-  .searchBtn {
-    display: flex;
-  }
+:global(.ant-menu-inline .ant-menu-item:last-child),
+:global(.ant-menu-inline .ant-menu-submenu:last-child > .ant-menu-submenu-title) {
+  border-bottom: none !important;
+}
 
-  .navbarContent {
-    padding: 12px 16px;
-    gap: 12px;
-  }
+/* Sub-menu items in mobile */
+:global(.ant-menu-inline .ant-menu-sub .ant-menu-item) {
+  padding-left: 40px !important;
+  background: #f9f9f9 !important;
+}
 
-  .logo {
-    flex: 1;
-    justify-content: center;
-  }
+:global(.ant-menu-inline .ant-menu-sub .ant-menu-item:hover) {
+  background: #3f444b !important;
+  color: #61ce70 !important;
+}
 
-  .navLinks {
+:global(.ant-menu-inline .ant-menu-sub .ant-menu-item-selected) {
+  background: #3f444b !important;
+  color: #61ce70 !important;
+}
+
+/* Nested sub-menu items (level 3+) */
+:global(.ant-menu-inline .ant-menu-sub .ant-menu-sub .ant-menu-item) {
+  padding-left: 60px !important;
+}
+
+:global(.ant-menu-inline .ant-menu-sub .ant-menu-sub .ant-menu-item-selected) {
+  background: #3f444b !important;
+  color: #61ce70 !important;
+}
+
+/* Remove default Ant Design inline menu borders */
+:global(.ant-menu-inline),
+:global(.ant-menu-inline .ant-menu-sub) {
+  border: none !important;
+}
+
+:global(.ant-menu-inline.ant-menu-root) {
+  border-inline-end: none !important;
+}
+
+/* Smooth transitions for mobile menu */
+@media (max-width: 1023px) {
+  .desktopMenuItem,
+  .desktopMenuButton,
+  .desktopMenuDropdown,
+  .desktopMenuPanel {
     display: none;
   }
+}
 
-  .search {
-    display: none !important;
+/* Prevent flash of content */
+.mobileMenuContent {
+  will-change: max-height;
+}
+
+/* Custom scrollbar for mobile menu */
+@media (max-width: 1023px) {
+  .mobileMenuContent::-webkit-scrollbar {
+    width: 4px;
   }
 
-  .actions {
-    gap: 8px;
+  .mobileMenuContent::-webkit-scrollbar-track {
+    background: #f1f1f1;
   }
 
-  .actions .langSwitch {
-    display: none;
+  .mobileMenuContent::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 2px;
   }
 
-  .mobileSearch {
-    display: block;
+  .mobileMenuContent::-webkit-scrollbar-thumb:hover {
+    background: #555;
   }
 }

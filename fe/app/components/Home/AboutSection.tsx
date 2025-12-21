@@ -1,40 +1,42 @@
 "use client";
 
-import React from "react";
 import { Button, Row, Col, Card } from "antd";
-
-const categories = [
-  {
-    src: "/images/welding.webp",
-    label: "WELDING",
-    alt: "Welding Tools",
-    width: "w-full",
-    height: { mobile: "h-32", desktop: "md:h-[200px]" },
-  },
-  {
-    src: "/images/powertools.webp",
-    label: "POWER TOOLS",
-    alt: "Power Tools",
-    width: "w-full",
-    height: { mobile: "h-64", desktop: "md:h-[400px]" },
-  },
-  {
-    src: "/images/engine.webp",
-    label: "ENGINE",
-    alt: "Engine",
-    width: "w-full",
-    height: { mobile: "h-64", desktop: "md:h-[400px]" },
-  },
-  {
-    src: "/images/accessories.webp",
-    label: "ACCESSORIES",
-    alt: "Accessories",
-    width: "w-full",
-    height: { mobile: "h-32", desktop: "md:h-[200px]" },
-  },
-];
+import { useLanguage } from "@/app/providers/LanguageProvider";
 
 export default function AboutSection() {
+  const { t } = useLanguage();
+
+  const categories = [
+    {
+      src: "/images/welding.webp",
+      label: t.home.categories.welding,
+      alt: "Welding Tools",
+      width: "w-full",
+      height: { mobile: "h-32", desktop: "md:h-[200px]" },
+    },
+    {
+      src: "/images/powertools.webp",
+      label: t.home.categories.powerTools,
+      alt: "Power Tools",
+      width: "w-full",
+      height: { mobile: "h-64", desktop: "md:h-[400px]" },
+    },
+    {
+      src: "/images/engine.webp",
+      label: t.home.categories.engine,
+      alt: "Engine",
+      width: "w-full",
+      height: { mobile: "h-64", desktop: "md:h-[400px]" },
+    },
+    {
+      src: "/images/accessories.webp",
+      label: t.home.categories.accessories,
+      alt: "Accessories",
+      width: "w-full",
+      height: { mobile: "h-32", desktop: "md:h-[200px]" },
+    },
+  ];
+
   return (
     <div
       className="py-20"
@@ -101,24 +103,18 @@ export default function AboutSection() {
           <Col xs={{ span: 24, order: 1 }} lg={{ span: 12, order: 2 }}>
             <div className="pl-0 lg:pl-5 text-center lg:text-left">
               <h2 className="text-4xl lg:text-6xl font-bold text-[#2d6a2e] mb-8 leading-tight">
-                About Us
+                {t.home.aboutTitle}
               </h2>
-              <p className="text-base lg:text-lg text-gray-600 leading-relaxed mb-10">
-                RYU Power Tools offers a wide range of modern power tools and
-                woodworking equipment—such as drills, grinders, wood planers,
-                compressors, and more—designed to deliver quality performance at
-                competitive prices. Backed by proven experience, our tools are
-                trusted to meet the specific needs of customers across
-                residential, commercial, industrial, institutional, and civil
-                engineering sectors.
+              <p className="text-base lg:text-lg text-gray-600 leading-relaxed mb-10 whitespace-pre-wrap">
+                {t.home.aboutDescription}
               </p>
-              <Button
-                type="primary"
-                size="large"
-                className="!bg-[#2d6a2e] hover:!bg-[#3d8a3e] !border-none !rounded-full !px-12 !h-auto !py-3 !text-base font-semibold tracking-wider"
+              <button
+                type="button"
+                className="px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
+                onClick={() => (window.location.href = "/contact")}
               >
-                Learn More
-              </Button>
+                {t.home.aboutCTA}
+              </button>
             </div>
           </Col>
         </Row>

@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { Spin, Empty } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useLanguage } from '@/app/providers/LanguageProvider';
 import type { Article } from '@/app/lib/article-api';
 import { getPublicArticles } from '@/app/lib/article-api';
 
 export default function BlogPage() {
+  const { t } = useLanguage();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,10 +48,10 @@ export default function BlogPage() {
       <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
         <div className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl font-bold text-[#2d5016] underline mb-4">
-            BLOG
+            {t.blog.title.toUpperCase()}
           </h1>
           <p className="text-lg text-gray-600">
-            Latest news, articles, and updates from RYU Power Tools
+            {t.blog.subtitle}
           </p>
         </div>
 
@@ -84,7 +86,7 @@ export default function BlogPage() {
               ))}
             </div>
           ) : (
-            <Empty description="No articles found" style={{ marginTop: 60, marginBottom: 60 }} />
+            <Empty description={t.blog.noArticlesFound} style={{ marginTop: 60, marginBottom: 60 }} />
           )}
         </Spin>
       </div>
