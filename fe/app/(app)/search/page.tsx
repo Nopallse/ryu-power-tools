@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button, Spin, Empty } from 'antd';
 import { LoadingOutlined, HomeOutlined } from '@ant-design/icons';
@@ -9,7 +9,7 @@ import type { Product } from '@/app/lib/product-api';
 import { searchPublicProducts } from '@/app/lib/product-api';
 import { useLanguage } from '@/app/providers/LanguageProvider';
 
-const SearchPage: React.FC = () => {
+const SearchContent: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { t } = useLanguage();
@@ -136,5 +136,19 @@ const SearchPage: React.FC = () => {
     </div>
   );
 };
+
+const SearchPage: React.FC = () => (
+  <Suspense
+    fallback={
+      <div className="bg-white py-20">
+        <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16 flex justify-center">
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 48, color: '#2d6a2e' }} />} />
+        </div>
+      </div>
+    }
+  >
+    <SearchContent />
+  </Suspense>
+);
 
 export default SearchPage;

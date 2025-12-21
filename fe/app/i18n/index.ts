@@ -3,7 +3,11 @@ import id from './locales/id';
 
 export type Language = 'en' | 'id';
 
-export type Translations = typeof en;
+type DeepString<T> = {
+  [K in keyof T]: T[K] extends string ? string : DeepString<T[K]>;
+};
+
+export type Translations = DeepString<typeof en>;
 
 export const translations: Record<Language, Translations> = {
   en,
