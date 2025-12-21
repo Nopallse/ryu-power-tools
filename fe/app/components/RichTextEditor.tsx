@@ -2,10 +2,10 @@
 
 import React, { useRef, useMemo, forwardRef, useImperativeHandle, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import 'react-quill-new/dist/quill.snow.css';
+import 'react-quill/dist/quill.snow.css';
 
 const ReactQuill = dynamic(
-  () => import('react-quill-new').then(mod => mod.default as unknown as React.ComponentType<any>),
+  () => import('react-quill').then(mod => mod.default as unknown as React.ComponentType<any>),
   {
     ssr: false,
     loading: () => <div className="min-h-[300px] bg-gray-50 animate-pulse rounded" />,
