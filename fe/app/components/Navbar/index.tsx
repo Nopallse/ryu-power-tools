@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Input, Menu, Drawer } from 'antd';
+import { Input, Menu, Drawer, message } from 'antd';
 import { SearchOutlined, MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import type { CategoryNode } from '@/app/lib/category-api';
@@ -40,6 +40,36 @@ const Navbar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryItems, setCategoryItems] = useState<MenuProps['items']>([]);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const [catalogueUrl, setCatalogueUrl] = useState<string | null>(null);
+
+  // Fetch catalogue URL from backend
+  useEffect(() => {
+    (async () => {
+      try {
+        const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
+        const response = await fetch(`${API_BASE}/catalogue`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          const catalogue = data.data || data;
+          
+          if (catalogue && catalogue.fileUrl) {
+            setCatalogueUrl(`${API_BASE}${catalogue.fileUrl}`);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load catalogue:', error);
+      }
+    })();
+  }, []);
+
+  // Handle catalog click
+  const handleCatalogClick = (e: React.MouseEvent) => {
+    if (!catalogueUrl) {
+      e.preventDefault();
+      message.warning( 'Catalog is not available at the moment');
+    }
+  };
 
   // Build menu items with translations
   const menuItems = useMemo((): MenuProps['items'] => [
@@ -63,14 +93,22 @@ const Navbar: React.FC = () => {
     },
     {
       key: 'catalog',
-      label: (
+      label: catalogueUrl ? (
         <a 
-          href="/catalog/ryu-catalog.pdf" 
+          href={catalogueUrl} 
           target="_blank" 
           rel="noopener noreferrer"
+          onClick={handleCatalogClick}
         >
           {t.nav.viewCatalog}
         </a>
+      ) : (
+        <span 
+          className="cursor-not-allowed opacity-50"
+          onClick={handleCatalogClick}
+        >
+          {t.nav.viewCatalog}
+        </span>
       ),
     },
     {
@@ -100,7 +138,7 @@ const Navbar: React.FC = () => {
         { key: 'warranty', label: <Link href="/warranty">{t.nav.warranty}</Link> },
       ],
     },
-  ], [t, categoryItems]);
+  ], [t, categoryItems, catalogueUrl]);
 
   // Helper function to find menu key by pathname
   const findMenuKeyByPath = (items: MenuProps['items'], path: string, parentKeys: string[] = []): { key: string | null; parents: string[] } => {

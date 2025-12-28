@@ -13,8 +13,8 @@ import {
   Tag,
   Input,
   Spin,
-  Table,
   Popconfirm,
+  Descriptions,
 } from 'antd';
 import {
   UploadOutlined,
@@ -23,11 +23,10 @@ import {
   EditOutlined,
   FileOutlined,
   CloudUploadOutlined,
-  PlusOutlined,
   LoadingOutlined,
+  FilePdfOutlined,
 } from '@ant-design/icons';
 import type { UploadFile } from 'antd/es/upload/interface';
-import type { ColumnsType } from 'antd/es/table';
 import { useAuthGuard } from '@/app/hooks/useAuthGuard';
 import {
   getCatalogues,
@@ -43,38 +42,36 @@ const CatalogsPage = () => {
   const { auth, ready } = useAuthGuard();
   const { message } = App.useApp();
 
-  const [catalogues, setCatalogues] = useState<Catalogue[]>([]);
+  const [catalogue, setCatalogue] = useState<Catalogue | null>(null);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   useEffect(() => {
     if (!ready || !auth) return;
-    loadCatalogues();
+    loadCatalogue();
   }, [ready, auth]);
 
-  const loadCatalogues = async () => {
+  const loadCatalogue = async () => {
     setLoading(true);
     try {
       const data = await getCatalogues(auth!.token);
-      const list = Array.isArray(data) ? data : [];
-      setCatalogues(list);
+      // Backend mengembalikan single object atau null
+      setCatalogue(data || null);
     } catch (error) {
-      message.error('Failed to load catalogues');
+      message.error('Failed to load catalogue');
       console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  const showModal = (catalogue?: Catalogue) => {
+  const showModal = () => {
     setFileList([]);
     
     if (catalogue) {
-      setEditingId(catalogue.id);
       form.setFieldsValue({
         title: catalogue.title,
       });
@@ -90,7 +87,6 @@ const CatalogsPage = () => {
         ]);
       }
     } else {
-      setEditingId(null);
       form.resetFields();
     }
     setIsModalOpen(true);
@@ -98,7 +94,6 @@ const CatalogsPage = () => {
 
   const handleCancel = () => {
     setIsModalOpen(false);
-    setEditingId(null);
     form.resetFields();
     setFileList([]);
   };
@@ -121,38 +116,41 @@ const CatalogsPage = () => {
         if (file.originFileObj) {
           formData.append('file', file.originFileObj);
         }
-      } else if (!editingId) {
+      } else if (!catalogue) {
         message.error('Please upload a PDF file');
         setUploading(false);
         return;
       }
 
-      if (editingId) {
-        await updateCatalogue(editingId, formData, auth.token);
+      if (catalogue) {
+        // Update existing catalogue
+        await updateCatalogue(catalogue.id, formData, auth.token);
         message.success('Catalogue updated successfully');
       } else {
+        // Create new catalogue
         await createCatalogue(formData, auth.token);
-        message.success('Catalogue created successfully');
+        message.success('Catalogue uploaded successfully');
       }
 
       setIsModalOpen(false);
-      setEditingId(null);
       form.resetFields();
       setFileList([]);
-      loadCatalogues();
+      loadCatalogue();
     } catch (error) {
-      message.error(editingId ? 'Failed to update catalogue' : 'Failed to create catalogue');
+      message.error(catalogue ? 'Failed to update catalogue' : 'Failed to upload catalogue');
       console.error(error);
     } finally {
       setUploading(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!catalogue) return;
+    
     try {
-      await deleteCatalogue(id, auth!.token);
+      await deleteCatalogue(catalogue.id, auth!.token);
       message.success('Catalogue deleted successfully');
-      loadCatalogues();
+      setCatalogue(null);
     } catch (error) {
       message.error('Failed to delete catalogue');
       console.error(error);
@@ -163,73 +161,18 @@ const CatalogsPage = () => {
     setFileList(newFileList.slice(-1));
   };
 
-  const handleDownload = (fileUrl: string, title: string) => {
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}${fileUrl}`;
+  const handleDownload = () => {
+    if (!catalogue) return;
+    
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}${catalogue.fileUrl}`;
     const link = document.createElement('a');
     link.href = url;
-    link.download = title || 'catalogue.pdf';
+    link.download = catalogue.title || 'catalogue.pdf';
     link.target = '_blank';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
-
-  const columns: ColumnsType<Catalogue> = [
-    {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
-      render: (title: string) => title || 'Untitled',
-    },
-    {
-      title: 'File',
-      dataIndex: 'fileUrl',
-      key: 'fileUrl',
-      render: (fileUrl: string) => (
-        <div className="flex items-center gap-2">
-          <FileOutlined className="text-blue-500" />
-          <span className="text-sm text-gray-600">{fileUrl.split('/').pop()}</span>
-        </div>
-      ),
-    },
-    {
-      title: 'Upload Date',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      width: 150,
-      render: (date: string) => date ? dayjs(date).format('YYYY-MM-DD') : '-',
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      fixed: 'right',
-      width: 180,
-      render: (_, record) => (
-        <Space size="small">
-          <Button
-            type="primary"
-            size="small"
-            icon={<DownloadOutlined />}
-            onClick={() => handleDownload(record.fileUrl, record.title || 'catalogue')}
-          />
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => showModal(record)}
-          />
-          <Popconfirm
-            title="Delete Catalogue"
-            description="Are you sure you want to delete this catalogue?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button type="primary" danger size="small" icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
 
   if (!ready) return null;
 
@@ -237,92 +180,140 @@ const CatalogsPage = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Product Catalogs</h1>
-          <p className="text-gray-600">Manage product catalog PDF files</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Product Catalog</h1>
+          <p className="text-gray-600">Manage your product catalog PDF file</p>
         </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          size="large"
-          onClick={() => showModal()}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          Upload Catalog
-        </Button>
+        {!catalogue && (
+          <Button
+            type="primary"
+            icon={<CloudUploadOutlined />}
+            size="large"
+            onClick={showModal}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            Upload Catalog
+          </Button>
+        )}
       </div>
 
-      {catalogues.length > 0 ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Table */}
-          <div className="lg:col-span-2">
-            <Card variant="borderless" className="shadow-sm">
-              <Spin spinning={loading} indicator={<LoadingOutlined style={{ fontSize: 24 }} />}>
-                <Table
-                  columns={columns}
-                  dataSource={catalogues}
-                  rowKey="id"
-                  pagination={{
-                    pageSize: 10,
-                    showTotal: (total) => `Total ${total} catalogues`,
-                  }}
-                />
-              </Spin>
-            </Card>
-          </div>
+      <Spin spinning={loading} indicator={<LoadingOutlined style={{ fontSize: 24 }} />}>
+        {catalogue ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Main Content */}
+            <div className="lg:col-span-2">
+              <Card 
+                variant="borderless" 
+                className="shadow-sm"
+                title={
+                  <div className="flex items-center gap-2">
+                    <FilePdfOutlined className="text-red-500 text-xl" />
+                    <span className="text-lg font-semibold">Current Catalog</span>
+                  </div>
+                }
+              >
+                <Descriptions column={1} bordered>
+                  <Descriptions.Item label="Title">
+                    <span className="font-medium">{catalogue.title || 'Untitled'}</span>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="File Name">
+                    {catalogue.fileUrl.split('/').pop()}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="File URL">
+                    <a 
+                      href={`${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}${catalogue.fileUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {`${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}${catalogue.fileUrl}`}
+                    </a>
+                  </Descriptions.Item>
+                  {catalogue.createdAt && (
+                    <Descriptions.Item label="Upload Date">
+                      {dayjs(catalogue.createdAt).format('MMMM DD, YYYY HH:mm')}
+                    </Descriptions.Item>
+                  )}
+                  {catalogue.updatedAt && (
+                    <Descriptions.Item label="Last Updated">
+                      {dayjs(catalogue.updatedAt).format('MMMM DD, YYYY HH:mm')}
+                    </Descriptions.Item>
+                  )}
+                </Descriptions>
 
-          {/* Stats Sidebar */}
-          <div className="space-y-4">
-            <Card variant="borderless" className="shadow-sm">
-              <Statistic
-                title="Total Catalogues"
-                value={catalogues.length}
-                prefix={<FileOutlined />}
-                valueStyle={{ color: '#2d6a2e' }}
-              />
-            </Card>
-
-            <Card variant="borderless" className="shadow-sm">
-              <div>
-                <div className="text-xs text-gray-600 mb-2">Status</div>
-                <Tag color="success" className="text-sm px-3 py-1">
-                  Active
-                </Tag>
-              </div>
-            </Card>
+                <div className="mt-6 flex gap-3">
+                  <Button
+                    type="primary"
+                    icon={<DownloadOutlined />}
+                    size="large"
+                    onClick={handleDownload}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Download
+                  </Button>
+                  <Button
+                    icon={<EditOutlined />}
+                    size="large"
+                    onClick={showModal}
+                  >
+                    Update
+                  </Button>
+                  <Popconfirm
+                    title="Delete Catalogue"
+                    description="Are you sure you want to delete this catalogue? This action cannot be undone."
+                    onConfirm={handleDelete}
+                    okText="Yes, Delete"
+                    cancelText="Cancel"
+                    okButtonProps={{ danger: true }}
+                  >
+                    <Button 
+                      danger 
+                      icon={<DeleteOutlined />}
+                      size="large"
+                    >
+                      Delete
+                    </Button>
+                  </Popconfirm>
+                </div>
+              </Card>
+            </div>
           </div>
-        </div>
-      ) : (
-        <Card variant="borderless" className="shadow-sm text-center py-12">
-          <Spin spinning={loading} indicator={<LoadingOutlined style={{ fontSize: 24 }} />}>
-            {!loading && (
+        ) : (
+          !loading && (
+            <Card variant="borderless" className="shadow-sm text-center py-12">
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="No catalog files uploaded yet"
+                description="No catalog file uploaded yet"
                 style={{ marginBottom: 24 }}
               >
                 <Button
                   type="primary"
                   size="large"
                   icon={<CloudUploadOutlined />}
-                  onClick={() => showModal()}
+                  onClick={showModal}
                   className="bg-green-600 hover:bg-green-700"
                 >
-                  Upload First Catalog
+                  Upload Your First Catalog
                 </Button>
               </Empty>
-            )}
-          </Spin>
-        </Card>
-      )}
+            </Card>
+          )
+        )}
+      </Spin>
 
       {/* Upload/Edit Modal */}
       <Modal
-        title={editingId ? 'Edit Catalog' : 'Upload New Catalog'}
+        title={
+          <div className="flex items-center gap-2">
+            {catalogue ? <EditOutlined /> : <CloudUploadOutlined />}
+            <span>{catalogue ? 'Update Catalog' : 'Upload New Catalog'}</span>
+          </div>
+        }
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
         confirmLoading={uploading}
         width={600}
+        okText={catalogue ? 'Update' : 'Upload'}
         okButtonProps={{ className: 'bg-green-600' }}
       >
         <Form form={form} layout="vertical" className="mt-4">
@@ -336,7 +327,7 @@ const CatalogsPage = () => {
 
           <Form.Item
             label="Catalog File (PDF)"
-            rules={[{ required: !editingId, message: 'Please upload PDF file' }]}
+            rules={[{ required: !catalogue, message: 'Please upload PDF file' }]}
           >
             <Upload
               fileList={fileList}
@@ -347,13 +338,18 @@ const CatalogsPage = () => {
               listType="text"
             >
               <Button icon={<UploadOutlined />} size="large" className="w-full">
-                Click to Upload PDF
+                {catalogue ? 'Click to Replace PDF' : 'Click to Upload PDF'}
               </Button>
             </Upload>
           </Form.Item>
 
-          <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm">
-            <strong>Note:</strong> Only PDF files are accepted. Maximum file size is 50MB.
+          <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm space-y-1">
+            <div><strong>Requirements:</strong></div>
+            <ul className="list-disc list-inside ml-2 space-y-1">
+              <li>Only PDF files are accepted</li>
+              <li>Maximum file size is 50MB</li>
+              {catalogue && <li>New file will replace the existing catalog</li>}
+            </ul>
           </div>
         </Form>
       </Modal>

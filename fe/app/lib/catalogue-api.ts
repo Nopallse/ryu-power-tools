@@ -4,14 +4,14 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000"
 
 export type Catalogue = {
   id: string;
-  name?: string;
   title?: string;
   fileUrl: string;
   createdAt?: string;
   updatedAt?: string;
 };
 
-export async function getCatalogues(token: string): Promise<Catalogue[]> {
+// Backend returns single catalogue object, not array
+export async function getCatalogues(token: string): Promise<Catalogue | null> {
   if (!token) {
     console.error('ERROR: No token provided to getCatalogues');
     throw new Error("Authentication token is missing");
@@ -24,11 +24,12 @@ export async function getCatalogues(token: string): Promise<Catalogue[]> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch catalogues");
+    throw new Error("Failed to fetch catalogue");
   }
 
   const result = await response.json();
-  return result.data || result;
+  // Backend mengembalikan single object dari findFirst()
+  return result.data || result || null;
 }
 
 export async function getCatalogueById(id: string, token: string): Promise<Catalogue> {
