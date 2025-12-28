@@ -29,7 +29,15 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadFile } from 'antd/es/upload/interface';
-import { getProducts, createProduct, updateProduct, deleteProduct, type Product, type ProductImage } from '@/app/lib/product-api';
+import { 
+  getProducts, 
+  createProduct, 
+  updateProduct, 
+  deleteProduct, 
+  deleteProductImage,
+  type Product, 
+  type ProductImage 
+} from '@/app/lib/product-api';
 import { getCategoryTree, type TreeSelectNode } from '@/app/lib/category-api';
 import { useAuthGuard } from '@/app/hooks/useAuthGuard';
 import { App } from 'antd';
@@ -87,7 +95,6 @@ const ProductsPage = () => {
   const showModal = (product?: Product) => {
     if (product) {
       setEditingId(product.id);
-      // Extract category IDs from productCategory
       const categoryIds = product.productCategory?.map((cat) => cat.categoryId) || [];
       form.setFieldsValue({
         name: product.name,
@@ -95,7 +102,6 @@ const ProductsPage = () => {
         storeUrl: product.storeUrl,
         categoryIds: categoryIds,
       });
-      // Set existing images from the product
       setExistingImages(product.productImages || []);
       setFileList([]);
     } else {
@@ -115,8 +121,18 @@ const ProductsPage = () => {
     setExistingImages([]);
   };
 
-  const handleRemoveExistingImage = (imageUrl: string) => {
-    setExistingImages(existingImages.filter(img => img.url !== imageUrl));
+  const handleRemoveExistingImage = async (imageUrl: string) => {
+    if (!editingId || !auth) return;
+
+    try {
+      await deleteProductImage(editingId, imageUrl, auth.token);
+      setExistingImages(existingImages.filter(img => img.url !== imageUrl));
+      message.success('Image deleted successfully');
+      loadProducts();
+    } catch (error) {
+      message.error('Failed to delete image');
+      console.error(error);
+    }
   };
 
   const handleOk = async () => {
@@ -134,7 +150,6 @@ const ProductsPage = () => {
       formData.append('description', values.description || '');
       formData.append('storeUrl', values.storeUrl || '');
 
-      // Add category IDs to formData
       if (values.categoryIds && values.categoryIds.length > 0) {
         values.categoryIds.forEach((categoryId: string) => {
           formData.append('categoryIds', categoryId);
@@ -368,40 +383,45 @@ const ProductsPage = () => {
           </Form.Item>
 
           <Form.Item label="Product Images">
-            {/* Display existing images when editing */}
             {editingId && existingImages.length > 0 && (
               <div className="mb-4">
                 <div className="text-sm text-gray-600 mb-2">Current Images:</div>
                 <div className="grid grid-cols-4 gap-3">
                   {existingImages.map((img, index) => (
-                    <div key={index} className="relative w-full" style={{ paddingBottom: '100%' }}>
+                    <div key={index} className="relative">
                       <Image
                         src={img.url}
                         alt={`Product image ${index + 1}`}
                         className="w-full h-24 object-cover rounded-lg border"
                         preview={true}
                       />
-                      <Button
-                        type="primary"
-                        danger
-                        size="small"
-                        icon={<CloseCircleOutlined />}
-                        onClick={() => handleRemoveExistingImage(img.url)}
-                        style={{
-                          position: 'absolute',
-                          top: '-8px',
-                          right: '-8px',
-                          zIndex: 10,
-                        }}
-                        title="Remove image"
-                      />
+                      <Popconfirm
+                        title="Delete Image"
+                        description="Are you sure you want to delete this image?"
+                        onConfirm={() => handleRemoveExistingImage(img.url)}
+                        okText="Yes"
+                        cancelText="No"
+                      >
+                        <Button
+                          type="primary"
+                          danger
+                          size="small"
+                          icon={<CloseCircleOutlined />}
+                          style={{
+                            position: 'absolute',
+                            top: '-8px',
+                            right: '-8px',
+                            zIndex: 10,
+                          }}
+                          title="Remove image"
+                        />
+                      </Popconfirm>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Upload new images */}
             <div>
               <div className="text-sm text-gray-600 mb-2">
                 {editingId ? 'Add New Images:' : 'Upload Images:'}

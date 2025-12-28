@@ -50,7 +50,6 @@ export async function getProducts(token: string): Promise<Product[]> {
   const result = await response.json();
   const products = result.data || result;
   
-  // Convert relative image URLs to absolute URLs
   return products.map((product: Product) => ({
     ...product,
     productImages: (product.productImages || []).map(normalizeImage),
@@ -71,7 +70,6 @@ export async function getProductById(id: string, token: string): Promise<Product
   const result = await response.json();
   const product = result.data || result;
   
-  // Convert relative image URLs to absolute URLs
   return {
     ...product,
     productImages: (product.productImages || []).map(normalizeImage),
@@ -135,6 +133,26 @@ export async function deleteProduct(id: string, token: string): Promise<void> {
   }
 }
 
+export async function deleteProductImage(
+  productId: string,
+  imageUrl: string,
+  token: string
+): Promise<void> {
+  const response = await fetch(`${API_BASE}/product/${productId}/image`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ imageUrl }),
+  });
+
+  if (!response.ok) {
+    const message = await safeErrorMessage(response);
+    throw new Error(message ?? "Failed to delete image");
+  }
+}
+
 // Public (no-auth) helpers for site pages
 export async function getPublicLatestProducts(limit?: number): Promise<Product[]> {
   const response = await fetch(`${API_BASE}/product/latest`);
@@ -146,12 +164,10 @@ export async function getPublicLatestProducts(limit?: number): Promise<Product[]
   const result = await response.json();
   let products = result.data || result;
   
-  // Apply limit if provided
   if (limit) {
     products = products.slice(0, limit);
   }
   
-  // Convert relative image URLs to absolute URLs
   return products.map((product: Product) => ({
     ...product,
     productImages: (product.productImages || []).map(normalizeImage),
@@ -168,7 +184,6 @@ export async function getPublicProductById(id: string): Promise<Product> {
   const result = await response.json();
   const product = result.data || result;
   
-  // Convert relative image URLs to absolute URLs
   return {
     ...product,
     productImages: (product.productImages || []).map(normalizeImage),
@@ -185,7 +200,6 @@ export async function getPublicProductBySlug(slug: string): Promise<Product> {
   const result = await response.json();
   const product = result.data || result;
   
-  // Convert relative image URLs to absolute URLs
   return {
     ...product,
     productImages: (product.productImages || []).map(normalizeImage),
@@ -202,7 +216,6 @@ export async function getPublicProductsByCategorySlug(slug: string): Promise<Pro
   const result = await response.json();
   const products = result.data || result;
   
-  // Convert relative image URLs to absolute URLs
   return products.map((product: Product) => ({
     ...product,
     productImages: (product.productImages || []).map(normalizeImage),
@@ -219,7 +232,6 @@ export async function searchPublicProducts(query: string): Promise<Product[]> {
   const result = await response.json();
   const products = result.data || result;
   
-  // Convert relative image URLs to absolute URLs
   return products.map((product: Product) => ({
     ...product,
     productImages: (product.productImages || []).map(normalizeImage),
