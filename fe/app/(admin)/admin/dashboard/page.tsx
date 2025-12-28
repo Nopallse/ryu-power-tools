@@ -112,7 +112,7 @@ const DashboardPage = () => {
         allItems.push({
           key: `catalogue-${item.id}`,
           type: 'Catalogue',
-          title: item.name || item.title || 'Untitled Catalogue',
+          title:  item.title || 'Untitled Catalogue',
           date: item.updatedAt || item.createdAt || new Date().toISOString(),
         });
       });
