@@ -211,7 +211,7 @@ const Navbar: React.FC = () => {
       
       return {
         key: cat.id,
-        label: hasChildren ? cat.name : <Link href={fullPath}>{cat.name}</Link>,
+        label: <Link href={fullPath}>{cat.name}</Link>,
         children: hasChildren ? buildCategoryMenu(cat.children!, currentPath) : undefined,
       };
     });

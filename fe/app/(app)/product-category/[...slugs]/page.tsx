@@ -43,39 +43,57 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
     (async () => {
       try {
         setLoading(true);
+        console.log('=== Loading category:', categorySlug, '===');
 
         // First, get category data
         const categoryData = await getPublicCategoryBySlug(categorySlug);
+        console.log('Category data:', categoryData);
         setCategory(categoryData);
 
-        // Try to get children
+        // Try to get children first (prioritas)
         try {
           const childrenData = await getPublicCategoryChildrenBySlug(categorySlug);
-          console.log('Children data for', categorySlug, ':', childrenData);
+          console.log('Children data received:', childrenData);
+          console.log('Children array:', childrenData?.children);
+          console.log('Children length:', childrenData?.children?.length);
           
-          // Check if category has children
+          // Check if category has children - jika ada subcategory, tampilkan subcategory
           if (childrenData && childrenData.children && childrenData.children.length > 0) {
+            console.log('✅ HAS CHILDREN - Showing subcategories:', childrenData.children.length);
             setSubcategories(childrenData.children);
             setViewMode("subcategories");
-            console.log('Showing subcategories:', childrenData.children.length);
+            setProducts([]); // Clear products when showing subcategories
           } else {
-            // If no children, get products
-            console.log('No children found, fetching products for', categorySlug);
+            // If no children, get products - jika tidak ada subcategory, baru tampilkan produk
+            console.log('❌ NO CHILDREN - Fetching products for', categorySlug);
             const productsData = await getPublicProductsByCategorySlug(categorySlug);
+            console.log('Products fetched:', productsData?.length);
             setProducts(productsData);
+            setSubcategories([]); // Clear subcategories when showing products
             setViewMode("products");
           }
         } catch (childrenError) {
-          console.error('Error fetching children:', childrenError);
+          console.error('⚠️ ERROR fetching children:', childrenError);
           // If error getting children, try to get products
-          const productsData = await getPublicProductsByCategorySlug(categorySlug);
-          setProducts(productsData);
-          setViewMode("products");
+          try {
+            const productsData = await getPublicProductsByCategorySlug(categorySlug);
+            console.log('Fallback: Products fetched:', productsData?.length);
+            setProducts(productsData);
+            setSubcategories([]);
+            setViewMode("products");
+          } catch (productError) {
+            console.error('⚠️ ERROR fetching products:', productError);
+            // Both failed, show empty state
+            setProducts([]);
+            setSubcategories([]);
+            setViewMode("products");
+          }
         }
       } catch (error) {
-        console.error("Failed to load category:", error);
+        console.error("❌ Failed to load category:", error);
       } finally {
         setLoading(false);
+        console.log('=== Loading complete ===');
       }
     })();
   }, [categorySlug]);

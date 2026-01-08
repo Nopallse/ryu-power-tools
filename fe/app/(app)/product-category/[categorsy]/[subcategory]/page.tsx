@@ -26,25 +26,78 @@ const ProductCategoryPage: React.FC<ProductCategoryPageProps> = ({
 
   const [products, setProducts] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
+  const [subcategories, setSubcategories] = useState<
+    (Category & { productCount: number })[]
+  >([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"products" | "subcategories">(
+    "products"
+  );
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-        const [productsData, categoryData] = await Promise.all([
-          getPublicProductsByCategorySlug(subcategory),
-          getPublicCategoryBySlug(subcategory),
-        ]);
-        setProducts(productsData);
+        console.log('=== Loading category:', subcategory, '===');
+
+        // First, get category data
+        const categoryData = await getPublicCategoryBySlug(subcategory);
+        console.log('Category data:', categoryData);
         setCategory(categoryData);
+
+        // Try to get children first (prioritas)
+        try {
+          const { getPublicCategoryChildrenBySlug } = await import("@/app/lib/category-api");
+          const childrenData = await getPublicCategoryChildrenBySlug(subcategory);
+          console.log('Children data received:', childrenData);
+          console.log('Children array:', childrenData?.children);
+          console.log('Children length:', childrenData?.children?.length);
+          
+          // Check if category has children - jika ada subcategory, tampilkan subcategory
+          if (childrenData && childrenData.children && childrenData.children.length > 0) {
+            console.log('✅ HAS CHILDREN - Showing subcategories:', childrenData.children.length);
+            setSubcategories(childrenData.children);
+            setViewMode("subcategories");
+            setProducts([]); // Clear products when showing subcategories
+          } else {
+            // If no children, get products - jika tidak ada subcategory, baru tampilkan produk
+            console.log('❌ NO CHILDREN - Fetching products for', subcategory);
+            const productsData = await getPublicProductsByCategorySlug(subcategory);
+            console.log('Products fetched:', productsData?.length);
+            setProducts(productsData);
+            setSubcategories([]); // Clear subcategories when showing products
+            setViewMode("products");
+          }
+        } catch (childrenError) {
+          console.error('⚠️ ERROR fetching children:', childrenError);
+          // If error getting children, try to get products
+          try {
+            const productsData = await getPublicProductsByCategorySlug(subcategory);
+            console.log('Fallback: Products fetched:', productsData?.length);
+            setProducts(productsData);
+            setSubcategories([]);
+            setViewMode("products");
+          } catch (productError) {
+            console.error('⚠️ ERROR fetching products:', productError);
+            // Both failed, show empty state
+            setProducts([]);
+            setSubcategories([]);
+            setViewMode("products");
+          }
+        }
       } catch (error) {
-        console.error("Failed to load category:", error);
+        console.error("❌ Failed to load category:", error);
       } finally {
         setLoading(false);
+        console.log('=== Loading complete ===');
       }
     })();
   }, [subcategory]);
+
+  const getImageUrl = (imageUrl?: string): string => {
+    if (!imageUrl) return "/images/product.jpg";
+    return imageUrl.startsWith("http") ? imageUrl : `https://ryu.pariamankota.tech${imageUrl}`;
+  };
 
   const getProductImageUrl = (product: Product): string => {
     if (product.productImages && product.productImages.length > 0) {
@@ -78,7 +131,62 @@ const ProductCategoryPage: React.FC<ProductCategoryPageProps> = ({
           )}
         </div>
 
-        {!loading && products.length > 0 ? (
+        {!loading && viewMode === "subcategories" && subcategories.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {subcategories.map((subcat) => (
+              <Link
+                href={`/product-category/${categorsy}/${subcategory}/${subcat.slug}`}
+                key={subcat.id}
+              >
+                <div className="flex flex-col items-center">
+                  <Card
+                    hoverable
+                    className="w-full border-none shadow-none bg-transparent hover:translate-y-[-8px] transition-all duration-300"
+                    cover={
+                      <div className="w-full h-full border-none shadow-none flex items-center justify-center bg-white p-5">
+                        <Image
+                          alt={subcat.name}
+                          src={getImageUrl(subcat.imageUrl)}
+                          width={300}
+                          height={300}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.src = "/images/placeholder-product.jpg";
+                          }}
+                        />
+                      </div>
+                    }
+                  >
+                    <Card.Meta
+                      title={
+                        <h3 className="text-xl font-semibold text-[#2d5016] my-5 text-center">
+                          {subcat.name}
+                        </h3>
+                      }
+                      description={
+                        <div className="flex flex-col items-center">
+                          <p className="text-gray-600 mb-4 text-center">
+                            {subcat.productCount || 0} Product
+                            {subcat.productCount !== 1 ? "s" : ""}
+                          </p>
+                          <Button
+                            type="primary"
+                            block
+                            className="bg-[#e8e8e8] text-[#4a4a4a] border-none font-semibold h-[45px] rounded-none text-sm tracking-wide uppercase hover:bg-[#2d5016] hover:text-white"
+                          >
+                            VIEW PRODUCTS
+                          </Button>
+                        </div>
+                      }
+                    />
+                  </Card>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {!loading && viewMode === "products" && products.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {products.map((product) => (
               <Link href={`/product/${product.id}`} key={product.id}>
@@ -125,7 +233,7 @@ const ProductCategoryPage: React.FC<ProductCategoryPageProps> = ({
               </Link>
             ))}
           </div>
-        ) : !loading && products.length === 0 ? (
+        ) : !loading && viewMode === "products" && products.length === 0 && subcategories.length === 0 ? (
           <div className="text-center py-20">
             <h3 className="text-3xl text-gray-900 mb-3">
               No Products Available

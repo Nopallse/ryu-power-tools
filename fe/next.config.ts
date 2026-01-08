@@ -8,8 +8,8 @@ const nextConfig: NextConfig = {
         hostname: 'ryu.pariamankota.tech',
       },
       {
-        protocol: 'https',
-        hostname: 'ryu.pariamankota.tech',
+        protocol: 'http',
+        hostname: 'localhost',
       },
     ],
   },

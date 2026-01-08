@@ -232,14 +232,30 @@ export type CategoryWithChildren = {
 };
 
 export async function getPublicCategoryChildrenBySlug(slug: string): Promise<CategoryWithChildren> {
-  const response = await fetch(`${API_BASE}/category/by/${slug}/children`);
+  console.log('🔍 Fetching children for slug:', slug);
+  const url = `${API_BASE}/category/by/${slug}/children`;
+  console.log('🔗 URL:', url);
+  
+  const response = await fetch(url, {
+    cache: 'no-store', // Prevent caching
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
+  
+  console.log('📡 Response status:', response.status);
   
   if (!response.ok) {
+    console.error('❌ Response not OK:', response.status, response.statusText);
     throw new Error("Failed to fetch category children");
   }
 
   const result = await response.json();
-  return result.data || result;
+  console.log('📦 Raw result:', result);
+  console.log('📦 Result.data:', result.data);
+  const finalData = result.data || result;
+  console.log('✅ Final data to return:', finalData);
+  return finalData;
 }
 
 async function safeErrorMessage(response: Response): Promise<string | null> {
