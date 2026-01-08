@@ -226,6 +226,22 @@ export async function getPublicCategoryBySlug(slug: string): Promise<Category> {
   return result.data || result;
 }
 
+export type CategoryWithChildren = {
+  category: Category;
+  children: (Category & { productCount: number })[];
+};
+
+export async function getPublicCategoryChildrenBySlug(slug: string): Promise<CategoryWithChildren> {
+  const response = await fetch(`${API_BASE}/category/by/${slug}/children`);
+  
+  if (!response.ok) {
+    throw new Error("Failed to fetch category children");
+  }
+
+  const result = await response.json();
+  return result.data || result;
+}
+
 async function safeErrorMessage(response: Response): Promise<string | null> {
   try {
     const data = await response.json();

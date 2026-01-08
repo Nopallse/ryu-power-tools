@@ -207,7 +207,7 @@ export async function getPublicProductBySlug(slug: string): Promise<Product> {
 }
 
 export async function getPublicProductsByCategorySlug(slug: string): Promise<Product[]> {
-  const response = await fetch(`${API_BASE}/product/category/${slug}`);
+  const response = await fetch(`${API_BASE}/product/category-slug/${slug}`);
   
   if (!response.ok) {
     throw new Error("Failed to fetch products by category");

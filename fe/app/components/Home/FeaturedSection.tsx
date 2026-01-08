@@ -74,13 +74,17 @@ export default function FeaturedSection() {
               {categories.map((category) => (
                 <div key={category.id} className="flex flex-col h-full">
                   <Link href={`/category/${category.slug}`}>
-                    <div className="relative bg-gradient-to-br from-gray-300 to-gray-400 mb-4 overflow-hidden cursor-pointer rounded aspect-square">
-                      <img 
-                        src={getImageUrl(category.imageUrl)} 
-                        alt={category.name}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
+                    <div className="overflow-hidden rounded-none mb-4 shadow-md hover:scale-110 transition-transform duration-500">
+                    <img
+                      src={getImageUrl(category.imageUrl)}
+                      alt={category.name}
+                      className="w-full object-contain"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src =
+                          "/images/product.jpg";
+                      }}
+                    />
+                  </div>
                   </Link>
                   <h3 className="text-xl font-bold text-[#1c244b] mb-3">
                     {category.name}

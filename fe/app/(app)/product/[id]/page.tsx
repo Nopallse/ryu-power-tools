@@ -157,10 +157,10 @@ export default function ProductDetailPage() {
     );
   }
 
-  const primaryImage = product.productImages?.[selectedImageIndex] || 
+  const primaryImage = product.productImages?.[selectedImageIndex] ||
     product.productImages?.[0] || {
-    url: "/images/product.jpg",
-  };
+      url: "/images/product.jpg",
+    };
   const primaryImageUrl = getImageUrl(primaryImage.url);
 
   return (
@@ -209,9 +209,9 @@ export default function ProductDetailPage() {
             {/* Contact Button */}
             <div className="flex justify-center sm:justify-start">
               <Link href="/contact">
-              <button className="px-8 sm:px-10 py-3 sm:py-3.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base font-semibold tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer mb-8">
-                {t.product.contactUs}
-              </button>
+                <button className="px-8 sm:px-10 py-3 sm:py-3.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base font-semibold tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer mb-8">
+                  {t.product.contactUs}
+                </button>
               </Link>
             </div>
           </div>
@@ -336,10 +336,7 @@ export default function ProductDetailPage() {
                         e.stopPropagation();
                       }}
                     >
-                      <ZoomableImage
-                        src={primaryImageUrl}
-                        alt={product.name}
-                      />
+                      <ZoomableImage src={primaryImageUrl} alt={product.name} />
                     </div>
                   </div>
                 </div>
@@ -359,7 +356,7 @@ export default function ProductDetailPage() {
 
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {latestProducts.map((item) => {
-              const itemImage = item.productImages?.[0] 
+              const itemImage = item.productImages?.[0];
               const itemImageUrl = getImageUrl(itemImage.url);
 
               return (
@@ -397,40 +394,39 @@ export default function ProductDetailPage() {
             </h2>
           </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {featuredCategories.map((category) => (
-                <div key={category.id} className="group">
-                  <Link
-                    href={`/product-category/${category.slug}`}
-                    className="block cursor-pointer"
-                  >
-                    <div className="overflow-hidden rounded-none mb-4 shadow-md hover:scale-110 transition-transform duration-500">
-                      <img
-                        src={getImageUrl(category.imageUrl)}
-                        alt={category.name}
-                        className="w-full object-contain"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src =
-                            "/images/product.jpg";
-                        }}
-                      />
-                    </div>
-                  </Link>
-                  <Link
-                    href={`/product-category/${category.slug}`}
-                    className="block cursor-pointer"
-                  >
-                    <h4 className="text-xl font-bold text-[#2d5016] mb-2 hover:text-[#72bd5a] transition-colors">
-                      {category.name}
-                    </h4>
-                  </Link>
-                  <p className="text-[#324A6D] text-sm lg:text-base leading-relaxed select-text cursor-text group-hover:cursor-text">
-                    {category.description ||
-                      t.product.exploreRange}
-                  </p>
-                </div>
-              ))}
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredCategories.map((category) => (
+              <div key={category.id} className="group">
+                <Link
+                  href={`/product-category/${category.slug}`}
+                  className="block cursor-pointer"
+                >
+                  <div className="overflow-hidden rounded-none mb-4 shadow-md hover:scale-110 transition-transform duration-500">
+                    <img
+                      src={getImageUrl(category.imageUrl)}
+                      alt={category.name}
+                      className="w-full object-contain"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src =
+                          "/images/product.jpg";
+                      }}
+                    />
+                  </div>
+                </Link>
+                <Link
+                  href={`/product-category/${category.slug}`}
+                  className="block cursor-pointer"
+                >
+                  <h4 className="text-xl font-bold text-[#2d5016] mb-2 hover:text-[#72bd5a] transition-colors">
+                    {category.name}
+                  </h4>
+                </Link>
+                <p className="text-[#324A6D] text-sm lg:text-base leading-relaxed select-text cursor-text group-hover:cursor-text">
+                  {category.description || t.product.exploreRange}
+                </p>
+              </div>
+            ))}
+          </div>
         </section>
       </div>
     </div>
