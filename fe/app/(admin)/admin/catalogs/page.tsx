@@ -28,6 +28,7 @@ import {
 } from '@ant-design/icons';
 import type { UploadFile } from 'antd/es/upload/interface';
 import { useAuthGuard } from '@/app/hooks/useAuthGuard';
+import { useUnauthorizedHandler } from '@/app/hooks/useUnauthorizedHandler';
 import {
   getCatalogues,
   createCatalogue,
@@ -41,6 +42,7 @@ import dayjs from 'dayjs';
 const CatalogsPage = () => {
   const { auth, ready } = useAuthGuard();
   const { message } = App.useApp();
+  const { handleError } = useUnauthorizedHandler();
 
   const [catalogue, setCatalogue] = useState<Catalogue | null>(null);
   const [loading, setLoading] = useState(false);
@@ -61,7 +63,10 @@ const CatalogsPage = () => {
       // Backend mengembalikan single object atau null
       setCatalogue(data || null);
     } catch (error) {
-      message.error('Failed to load catalogue');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error('Failed to load catalogue');
+      }
       console.error(error);
     } finally {
       setLoading(false);
@@ -137,7 +142,10 @@ const CatalogsPage = () => {
       setFileList([]);
       loadCatalogue();
     } catch (error) {
-      message.error(catalogue ? 'Failed to update catalogue' : 'Failed to upload catalogue');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error(catalogue ? 'Failed to update catalogue' : 'Failed to upload catalogue');
+      }
       console.error(error);
     } finally {
       setUploading(false);
@@ -152,7 +160,10 @@ const CatalogsPage = () => {
       message.success('Catalogue deleted successfully');
       setCatalogue(null);
     } catch (error) {
-      message.error('Failed to delete catalogue');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error('Failed to delete catalogue');
+      }
       console.error(error);
     }
   };

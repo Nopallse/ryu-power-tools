@@ -16,6 +16,7 @@ import {
 import { PlusOutlined, EditOutlined, DeleteOutlined, LoadingOutlined } from '@ant-design/icons';
 import type { UploadFile, RcFile } from 'antd/es/upload/interface';
 import { useAuthGuard } from '@/app/hooks/useAuthGuard';
+import { useUnauthorizedHandler } from '@/app/hooks/useUnauthorizedHandler';
 import {
   getCategories,
   getCategoryTree,
@@ -30,6 +31,7 @@ import { App } from 'antd';
 export default function CategoriesPage() {
   const { auth, ready } = useAuthGuard();
   const { message } = App.useApp();
+  const { handleError } = useUnauthorizedHandler();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryTree, setCategoryTree] = useState<TreeSelectNode[]>([]);
@@ -68,7 +70,10 @@ export default function CategoriesPage() {
       setCategoryTree(Array.isArray(tree) ? tree : []);
       setFilteredCategories(list);
     } catch (error) {
-      message.error('Failed to load categories');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error('Failed to load categories');
+      }
       console.error(error);
     } finally {
       setLoading(false);
@@ -153,7 +158,10 @@ export default function CategoriesPage() {
       setFileList([]);
       loadCategories();
     } catch (error) {
-      message.error(editingId ? 'Failed to update category' : 'Failed to create category');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error(editingId ? 'Failed to update category' : 'Failed to create category');
+      }
       console.error(error);
     } finally {
       setUploading(false);
@@ -166,7 +174,10 @@ export default function CategoriesPage() {
       message.success('Category deleted successfully');
       loadCategories();
     } catch (error) {
-      message.error('Failed to delete category');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error('Failed to delete category');
+      }
       console.error(error);
     }
   };

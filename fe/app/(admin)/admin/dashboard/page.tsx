@@ -14,6 +14,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useAuthGuard } from '@/app/hooks/useAuthGuard';
+import { useUnauthorizedHandler } from '@/app/hooks/useUnauthorizedHandler';
 import { getProducts, type Product } from '@/app/lib/product-api';
 import { getCategories, type Category } from '@/app/lib/category-api';
 import { getArticles, type Article } from '@/app/lib/article-api';
@@ -44,6 +45,7 @@ interface RecentItem {
 const DashboardPage = () => {
   const { auth, ready } = useAuthGuard();
   const { message } = App.useApp();
+  const { handleError } = useUnauthorizedHandler();
 
   const [stats, setStats] = useState<DashboardStats>({
     products: 0,
@@ -124,7 +126,10 @@ const DashboardPage = () => {
 
       setRecentItems(sorted);
     } catch (error) {
-      message.error('Failed to load dashboard data');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error('Failed to load dashboard data');
+      }
       console.error(error);
     } finally {
       setLoading(false);

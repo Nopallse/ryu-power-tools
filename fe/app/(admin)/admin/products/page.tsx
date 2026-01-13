@@ -40,6 +40,7 @@ import {
 } from '@/app/lib/product-api';
 import { getCategoryTree, type TreeSelectNode } from '@/app/lib/category-api';
 import { useAuthGuard } from '@/app/hooks/useAuthGuard';
+import { useUnauthorizedHandler } from '@/app/hooks/useUnauthorizedHandler';
 import { App } from 'antd';
 
 const { TextArea } = Input;
@@ -47,6 +48,7 @@ const { TextArea } = Input;
 const ProductsPage = () => {
   const { auth, ready } = useAuthGuard();
   const { message } = App.useApp();
+  const { handleError } = useUnauthorizedHandler();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -85,7 +87,10 @@ const ProductsPage = () => {
       setFilteredProducts(list);
       setCategoryTree(Array.isArray(tree) ? tree : []);
     } catch (error) {
-      message.error('Failed to load products');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error('Failed to load products');
+      }
       console.error(error);
     } finally {
       setLoading(false);
@@ -176,7 +181,10 @@ const ProductsPage = () => {
       setFileList([]);
       loadProducts();
     } catch (error) {
-      message.error(editingId ? 'Failed to update product' : 'Failed to create product');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error(editingId ? 'Failed to update product' : 'Failed to create product');
+      }
       console.error(error);
     } finally {
       setSubmitting(false);
@@ -189,7 +197,10 @@ const ProductsPage = () => {
       message.success('Product deleted successfully');
       loadProducts();
     } catch (error) {
-      message.error('Failed to delete product');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error('Failed to delete product');
+      }
       console.error(error);
     }
   };

@@ -2,9 +2,10 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Button, Spin, Empty } from 'antd';
+import { Button, Spin, Empty, Card } from 'antd';
 import { LoadingOutlined, HomeOutlined } from '@ant-design/icons';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Product } from '@/app/lib/product-api';
 import { searchPublicProducts } from '@/app/lib/product-api';
 import { useLanguage } from '@/app/providers/LanguageProvider';
@@ -76,27 +77,45 @@ const SearchContent: React.FC = () => {
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {products.map((product) => (
               <Link href={`/product/${product.id}`} key={product.id}>
-                <div className="bg-white flex flex-col items-center hover:translate-y-[-8px] transition-all duration-300">
-                  {/* Image with border */}
-                  <div className="w-full border-4 border-[#2d5016]">
-                    <img
-                      alt={product.name}
-                      src={getImageUrl(product)}
-                      className="aspect-square object-cover w-full"
+                <div className="flex flex-col items-center">
+                  <Card
+                    hoverable
+                    className="w-full border-none shadow-none bg-transparent hover:translate-y-[-8px] transition-all duration-300"
+                    cover={
+                      <div className="w-full h-full border-none shadow-none flex items-center justify-center bg-white p-5">
+                        <Image
+                          alt={product.name}
+                          src={getImageUrl(product)}
+                          width={300}
+                          height={300}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.src =
+                              "/images/placeholder-product.jpg";
+                          }}
+                        />
+                      </div>
+                    }
+                  >
+                    <Card.Meta
+                      title={
+                        <h3 className="text-xl font-semibold text-[#2d5016] my-5 text-center">
+                          {product.name}
+                        </h3>
+                      }
+                      description={
+                        <div className="flex flex-col items-center">
+                          <Button
+                            type="primary"
+                            block
+                            className="bg-[#e8e8e8] text-[#4a4a4a] border-none font-semibold h-[45px] rounded-none text-sm tracking-wide uppercase hover:bg-[#2d5016] hover:text-white"
+                          >
+                            READ MORE
+                          </Button>
+                        </div>
+                      }
                     />
-                  </div>
-
-                  {/* Product Name */}
-                  <h3 className="text-lg font-bold text-[#2d5016] mt-6 text-center px-4 line-clamp-2 min-h-[3.5rem]">
-                    {product.name}
-                  </h3>
-
-                  {/* Button */}
-                  <div className="w-full px-4 pb-6">
-                    <button className="w-full bg-[#e8e8e8] text-[#515151] font-semibold py-3 uppercase text-sm tracking-wider hover:bg-[#2d5016] hover:text-white transition-colors duration-300 rounded-md">
-                      {t.common.readMore}
-                    </button>
-                  </div>
+                  </Card>
                 </div>
               </Link>
             ))}

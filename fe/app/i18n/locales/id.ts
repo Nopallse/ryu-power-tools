@@ -73,7 +73,7 @@ const id = {
     ctaLink: 'HUBUNGI KAMI',
     
     // News & Article Section
-    newsTitle: 'BERITA & ARTIKEL',
+    newsTitle: 'BLOG',
     
     // No results
     noCategories: 'Tidak ada kategori yang tersedia',

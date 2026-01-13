@@ -73,7 +73,7 @@ const en = {
     ctaLink: 'CONTACT US',
     
     // News & Article Section
-    newsTitle: 'NEWS & ARTICLE',
+    newsTitle: 'BLOG',
     
     // No results
     noCategories: 'No categories available',

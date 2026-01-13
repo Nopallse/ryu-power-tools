@@ -21,6 +21,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useAuthGuard } from '@/app/hooks/useAuthGuard';
+import { useUnauthorizedHandler } from '@/app/hooks/useUnauthorizedHandler';
 import {
   getArticles,
   createArticle,
@@ -34,6 +35,7 @@ import ArticleForm from '@/app/components/ArticleForm';
 const BlogPage = () => {
   const { auth, ready } = useAuthGuard();
   const { message } = App.useApp();
+  const { handleError } = useUnauthorizedHandler();
 
   const [articles, setArticles] = useState<Article[]>([]);
   const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
@@ -63,7 +65,10 @@ const BlogPage = () => {
       setArticles(list);
       setFilteredArticles(list);
     } catch (error) {
-      message.error('Failed to load articles');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error('Failed to load articles');
+      }
       console.error(error);
     } finally {
       setLoading(false);
@@ -103,7 +108,10 @@ const BlogPage = () => {
 
       await loadArticles();
     } catch (error) {
-      message.error(editingArticle ? 'Failed to update article' : 'Failed to create article');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error(editingArticle ? 'Failed to update article' : 'Failed to create article');
+      }
       console.error(error);
       throw error;
     } finally {
@@ -117,7 +125,10 @@ const BlogPage = () => {
       message.success('Article deleted successfully');
       loadArticles();
     } catch (error) {
-      message.error('Failed to delete article');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error('Failed to delete article');
+      }
       console.error(error);
     }
   };

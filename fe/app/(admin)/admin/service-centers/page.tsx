@@ -24,6 +24,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useAuthGuard } from '@/app/hooks/useAuthGuard';
+import { useUnauthorizedHandler } from '@/app/hooks/useUnauthorizedHandler';
 import {
   getServiceCenters,
   createServiceCenter,
@@ -38,6 +39,7 @@ const { TextArea } = Input;
 const ServiceCentersPage = () => {
   const { auth, ready } = useAuthGuard();
   const { message } = App.useApp();
+  const { handleError } = useUnauthorizedHandler();
 
   const [serviceCenters, setServiceCenters] = useState<ServiceCenter[]>([]);
   const [filteredServiceCenters, setFilteredServiceCenters] = useState<ServiceCenter[]>([]);
@@ -69,7 +71,10 @@ const ServiceCentersPage = () => {
       setServiceCenters(list);
       setFilteredServiceCenters(list);
     } catch (error) {
-      message.error('Failed to load service centers');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error('Failed to load service centers');
+      }
       console.error(error);
     } finally {
       setLoading(false);
@@ -121,7 +126,10 @@ const ServiceCentersPage = () => {
       form.resetFields();
       loadServiceCenters();
     } catch (error) {
-      message.error(editingId ? 'Failed to update service center' : 'Failed to create service center');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error(editingId ? 'Failed to update service center' : 'Failed to create service center');
+      }
       console.error(error);
     } finally {
       setSubmitting(false);
@@ -134,7 +142,10 @@ const ServiceCentersPage = () => {
       message.success('Service center deleted successfully');
       loadServiceCenters();
     } catch (error) {
-      message.error('Failed to delete service center');
+      const wasUnauth = await handleError(error);
+      if (!wasUnauth) {
+        message.error('Failed to delete service center');
+      }
       console.error(error);
     }
   };
