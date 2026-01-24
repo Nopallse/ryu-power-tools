@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { getStoredAuth, type AuthSession } from "@/app/lib/auth-client";
 
-const DEFAULT_BYPASS = ["/login"];
+const DEFAULT_BYPASS = ["/log8i8n738"];
 
 export function useAuthGuard(bypassPaths: string[] = DEFAULT_BYPASS) {
   const pathname = usePathname();

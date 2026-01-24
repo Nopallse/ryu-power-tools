@@ -11,7 +11,7 @@ const { Title, Text } = Typography;
 
 const LoginPage = () => {
   const router = useRouter();
-  const { auth, ready } = useAuthGuard(["/login"]);
+  const { auth, ready } = useAuthGuard(["/log8i8n738"]);
   const { message } = App.useApp();
 
   useEffect(() => {

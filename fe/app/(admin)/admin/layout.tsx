@@ -99,7 +99,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       await logout();
       hide();
       message.success('Logged out');
-      router.replace('/login');
+      router.replace('/log8i8n738');
     }
   };
 

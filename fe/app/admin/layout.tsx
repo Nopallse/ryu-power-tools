@@ -89,7 +89,7 @@ export default function AdminLayout({
     await logout();
     hide();
     message.success('Logged out');
-    router.replace('/login');
+    router.replace('/log8i8n738');
   }, [router]);
 
   if (!ready) {

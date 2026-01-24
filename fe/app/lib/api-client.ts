@@ -9,7 +9,7 @@ import { clearStoredAuth } from "./auth-client";
 export function handleUnauthorized(router: any): void {
   console.warn("⚠️ Unauthorized: Token expired or invalid");
   clearStoredAuth();
-  router.push("/login");
+  router.push("/log8i8n738");
 }
 
 /**
@@ -69,7 +69,7 @@ export async function authenticatedFetch(
           // Fallback if router not provided
           clearStoredAuth();
           if (typeof window !== "undefined") {
-            window.location.href = "/login";
+            window.location.href = "/log8i8n738";
           }
         }
       }
