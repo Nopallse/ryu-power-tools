@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ryu.pariamankota.tech';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://ryupowertools.com';
   const currentDate = new Date();
 
   // Static routes
