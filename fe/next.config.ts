@@ -1,11 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'https://nest-api.ryupowertools.com',
+        hostname: 'ryu.pariamankota.tech',
       },
       {
         protocol: 'http',
