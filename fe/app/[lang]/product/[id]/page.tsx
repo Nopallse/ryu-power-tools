@@ -16,6 +16,7 @@ import {
   getPublicCategoryTree,
   CategoryNode as ApiCategoryNode,
 } from "@/app/lib/category-api";
+import { useTranslatedData } from "@/app/hooks/useTranslatedData";
 
 const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
@@ -86,7 +87,7 @@ const ZoomableImage = ({ src, alt }: { src: string; alt: string }) => {
 };
 
 export default function ProductDetailPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const params = useParams();
   const productId = params.id as string;
 
@@ -98,6 +99,20 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [showPreview, setShowPreview] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  // Translate product
+  const { translated: translatedProduct, isLoading: isTranslatingProduct } = useTranslatedData(
+    product,
+    language,
+    ['name', 'description']
+  );
+
+  // Translate latest products
+  const { translated: translatedLatestProducts, isLoading: isTranslatingLatest } = useTranslatedData(
+    latestProducts.length > 0 ? { items: latestProducts } : null,
+    language,
+    [] // Translate all fields
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -171,7 +186,7 @@ export default function ProductDetailPage() {
           {/* Left Column - Info */}
           <div className="order-2 lg:order-1">
             <h1 className="text-3xl sm:text-4xl font-bold text-[#2d5016] mb-6">
-              {product.name}
+              {isTranslatingProduct ? '...' : translatedProduct?.name || product?.name}
             </h1>
 
             <div className="mb-6">
@@ -180,7 +195,7 @@ export default function ProductDetailPage() {
                   {t.product.specifications}:
                 </span>
                 <pre className="whitespace-pre-wrap font-sans text-black leading-relaxed  py-4 rounded-lg text-sm">
-                  {product.description}
+                  {isTranslatingProduct ? '...' : translatedProduct?.description || product?.description}
                 </pre>
               </div>
             </div>
@@ -208,7 +223,7 @@ export default function ProductDetailPage() {
 
             {/* Contact Button */}
             <div className="flex justify-center sm:justify-start">
-              <Link href="/contact">
+              <Link href={`/${language}/contact`}>
                 <button className="px-8 sm:px-10 py-3 sm:py-3.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base font-semibold tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer mb-8">
                   {t.product.contactUs}
                 </button>
@@ -355,12 +370,12 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {latestProducts.map((item) => {
+            {(translatedLatestProducts?.items || latestProducts).map((item: any) => {
               const itemImage = item.productImages?.[0];
               const itemImageUrl = getImageUrl(itemImage.url);
 
               return (
-                <Link href={`/product/${item.id}`} key={item.id}>
+                <Link href={`/${language}/product/id/${item.id}`} key={item.id}>
                   <div className="flex flex-col h-full items-center justify-between">
                     <div className="bg-white border-3 border-[#2d6a2e] flex items-center justify-center aspect-square w-full overflow-hidden ">
                       <img
@@ -374,7 +389,7 @@ export default function ProductDetailPage() {
                       />
                     </div>
                     <h4 className="text-xl font-semibold text-[#2d5016] my-5 text-center">
-                      {item.name}
+                      {isTranslatingLatest ? '...' : item.name}
                     </h4>
                     <button className="px-6 py-2 bg-primary text-white border-none font-semibold text-sm tracking-wide uppercase hover:bg-[#2d5016] hover:text-white transition-colors cursor-pointer">
                       {t.product.readMore}
@@ -398,7 +413,7 @@ export default function ProductDetailPage() {
             {featuredCategories.map((category) => (
               <div key={category.id} className="group">
                 <Link
-                  href={`/product-category/${category.slug}`}
+                  href={`/${language}/product-category/${category.slug}`}
                   className="block cursor-pointer"
                 >
                   <div className="overflow-hidden rounded-none mb-4 shadow-md hover:scale-110 transition-transform duration-500">
@@ -414,7 +429,7 @@ export default function ProductDetailPage() {
                   </div>
                 </Link>
                 <Link
-                  href={`/product-category/${category.slug}`}
+                  href={`/${language}/product-category/${category.slug}`}
                   className="block cursor-pointer"
                 >
                   <h4 className="text-xl font-bold text-[#2d5016] mb-2 hover:text-[#72bd5a] transition-colors">

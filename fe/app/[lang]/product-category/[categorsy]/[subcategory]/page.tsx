@@ -96,7 +96,7 @@ const ProductCategoryPage: React.FC<ProductCategoryPageProps> = ({
 
   const getImageUrl = (imageUrl?: string): string => {
     if (!imageUrl) return "/images/product.jpg";
-    return imageUrl.startsWith("http") ? imageUrl : `https://ryu.pariamankota.tech${imageUrl}`;
+    return imageUrl.startsWith("http") ? imageUrl : `https://https://nest-api.ryupowertools.com${imageUrl}`;
   };
 
   const getProductImageUrl = (product: Product): string => {

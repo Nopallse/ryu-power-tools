@@ -9,6 +9,8 @@ import {
 } from "@ant-design/icons";
 import Link from "next/link";
 import Image from "next/image";
+import { useLanguage } from "@/app/providers/LanguageProvider";
+import { useTranslatedData } from "@/app/hooks/useTranslatedData";
 import type { Product } from "@/app/lib/product-api";
 import type { Category, CategoryWithChildren } from "@/app/lib/category-api";
 import { getPublicProductsByCategorySlug } from "@/app/lib/product-api";
@@ -26,6 +28,7 @@ interface CategoryPageProps {
 const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
   const { slugs } = use(params);
   const categorySlug = slugs[slugs.length - 1];
+  const { t, language } = useLanguage();
   const apiBase =
     process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
@@ -37,6 +40,27 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"products" | "subcategories">(
     "products"
+  );
+
+  // Translate products
+  const { translated: translatedProducts, isLoading: isTranslatingProducts } = useTranslatedData(
+    products.length > 0 ? { items: products } : null,
+    language,
+    [] // Translate all fields
+  );
+
+  // Translate category
+  const { translated: translatedCategory, isLoading: isTranslatingCategory } = useTranslatedData(
+    category,
+    language,
+    ['name', 'description']
+  );
+
+  // Translate subcategories
+  const { translated: translatedSubcategories, isLoading: isTranslatingSubcategories } = useTranslatedData(
+    subcategories.length > 0 ? { items: subcategories } : null,
+    language,
+    [] // Translate all fields
   );
 
   useEffect(() => {
@@ -100,7 +124,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
 
   const getImageUrl = (imageUrl?: string): string => {
     if (!imageUrl) return "/images/product.jpg";
-    return imageUrl.startsWith("http") ? imageUrl : `https://ryu.pariamankota.tech${imageUrl}`;
+    return imageUrl.startsWith("http") ? imageUrl : `https://https://nest-api.ryupowertools.com${imageUrl}`;
   };
 
   const getProductImageUrl = (product: Product): string => {
@@ -129,20 +153,20 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
           ) : (
             <>
               <h1 className="text-5xl font-bold text-[#2d5016] mb-3">
-                {category?.name || "Category"}
+                {isTranslatingCategory ? '...' : (translatedCategory?.name || category?.name || "Category")}
               </h1>
-              {category?.description && (
-                <p className="text-lg text-gray-600">{category.description}</p>
+              {(translatedCategory?.description || category?.description) && (
+                <p className="text-lg text-gray-600">{isTranslatingCategory ? '...' : (translatedCategory?.description || category?.description)}</p>
               )}
             </>
           )}
         </div>
 
-        {!loading && viewMode === "subcategories" && subcategories.length > 0 && (
+        {!loading && viewMode === "subcategories" && (translatedSubcategories?.items || subcategories).length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {subcategories.map((subcat) => (
+            {(translatedSubcategories?.items || subcategories).map((subcat: any) => (
               <Link
-                href={`/product-category/${categoryPath}/${subcat.slug}`}
+                href={`/${language}/product-category/${categoryPath}/${subcat.slug}`}
                 key={subcat.id}
               >
                 <div className="flex flex-col items-center">
@@ -193,10 +217,10 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
           </div>
         )}
 
-        {!loading && viewMode === "products" && products.length > 0 && (
+        {!loading && viewMode === "products" && (translatedProducts?.items || products).length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {products.map((product) => (
-              <Link href={`/product/${product.id}`} key={product.id}>
+            {(translatedProducts?.items || products).map((product: any) => (
+              <Link href={`/${language}/product/id/${product.id}`} key={product.id}>
                 <div className="flex flex-col items-center">
                   <Card
                     hoverable
@@ -220,7 +244,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
                     <Card.Meta
                       title={
                         <h3 className="text-xl font-semibold text-[#2d5016] my-5 text-center">
-                          {product.name}
+                          {isTranslatingProducts ? '...' : product.name}
                         </h3>
                       }
                       description={
@@ -244,7 +268,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
 
         {!loading &&
           viewMode === "products" &&
-          products.length === 0 &&
+          (translatedProducts?.items || products).length === 0 &&
           subcategories.length === 0 && (
             <div className="text-center py-20">
               <h3 className="text-3xl text-gray-900 mb-3">
@@ -253,7 +277,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
               <p className="text-base text-gray-600 mb-8">
                 Products for this category are coming soon.
               </p>
-              <Link href="/">
+              <Link href={`/${language}`}>
                 <Button
                   type="primary"
                   size="large"

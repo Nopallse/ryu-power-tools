@@ -78,7 +78,8 @@ const DashboardPage = () => {
       const productList = Array.isArray(products) ? products : [];
       const categoriesList = Array.isArray(categories) ? categories : [];
       const articlesList = Array.isArray(articles) ? articles : [];
-      const cataloguesList = Array.isArray(catalogues) ? catalogues : [];
+      // getCatalogues returns single object or null, not array
+      const cataloguesList = catalogues ? [catalogues] : [];
       const serviceCentersList = Array.isArray(serviceCenters) ? serviceCenters : [];
 
       setStats({

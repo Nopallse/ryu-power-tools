@@ -6,13 +6,21 @@ import { Spin, Empty } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { useTranslatedData } from '@/app/hooks/useTranslatedData';
 import type { Article } from '@/app/lib/article-api';
 import { getPublicArticles } from '@/app/lib/article-api';
 
 export default function BlogPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Translate all articles
+  const { translated: translatedArticles, isLoading: isTranslating } = useTranslatedData(
+    articles.length > 0 ? { items: articles } : null,
+    language,
+    [] // Translate all fields
+  );
 
   useEffect(() => {
     (async () => {
@@ -56,13 +64,13 @@ export default function BlogPage() {
         </div>
 
         <Spin
-          spinning={loading}
+          spinning={loading || isTranslating}
           indicator={<LoadingOutlined style={{ fontSize: 48, color: '#2d6a2e' }} />}
         >
-          {articles.length ? (
+          {(translatedArticles?.items || articles).length ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {articles.map((article) => (
-                <Link href={`/blog/${article.id}`} key={article.id}>
+              {(translatedArticles?.items || articles).map((article: any) => (
+                <Link href={`/${language}/blog/id/${article.id}`} key={article.id}>
                   <div className="flex flex-col h-full group cursor-pointer bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                     <div className="overflow-hidden">
                       <img
@@ -73,7 +81,7 @@ export default function BlogPage() {
                     </div>
                     <div className="p-6 flex flex-col flex-grow">
                       <h3 className="text-sm font-semibold text-gray-800 mb-4 line-clamp-3 leading-tight group-hover:text-[#2d5016] transition-colors text-center">
-                        {article.title}
+                        {isTranslating ? '...' : article.title}
                       </h3>
                       <div className="border-t border-gray-300 -mx-6 mt-auto pt-4 px-6">
                         <p className="text-xs text-gray-400 text-center">

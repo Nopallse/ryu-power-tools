@@ -51,6 +51,9 @@ const CatalogsPage = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
+  const isValidCatalogue = (item: Catalogue | null) =>
+    Boolean(item?.id && item.id !== 'undefined' && item.fileUrl);
+
   useEffect(() => {
     if (!ready || !auth) return;
     loadCatalogue();
@@ -75,23 +78,19 @@ const CatalogsPage = () => {
 
   const showModal = () => {
     setFileList([]);
-    
-    if (catalogue) {
+
+    const activeCatalogue = isValidCatalogue(catalogue) ? catalogue : null;
+
+    if (activeCatalogue) {
+      // Mode: Update existing catalogue
       form.setFieldsValue({
-        title: catalogue.title,
+        title: activeCatalogue.title,
       });
       
-      if (catalogue.fileUrl) {
-        setFileList([
-          {
-            uid: '-1',
-            name: 'catalogue.pdf',
-            status: 'done',
-            url: `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}${catalogue.fileUrl}`,
-          },
-        ]);
-      }
+      // Don't pre-load file - let user choose to upload new file or not
+      // Only show existing file info in description
     } else {
+      // Mode: Add new catalogue
       form.resetFields();
     }
     setIsModalOpen(true);
@@ -116,23 +115,43 @@ const CatalogsPage = () => {
       const formData = new FormData();
       if (values.title) formData.append('title', values.title);
 
+      // Handle file upload
       if (fileList.length > 0) {
         const file = fileList[0];
         if (file.originFileObj) {
-          formData.append('file', file.originFileObj);
+          const fileObj = file.originFileObj as File;
+          formData.append('file', fileObj, file.name || fileObj.name);
         }
-      } else if (!catalogue) {
-        message.error('Please upload a PDF file');
-        setUploading(false);
-        return;
       }
 
-      if (catalogue) {
-        // Update existing catalogue
-        await updateCatalogue(catalogue.id, formData, auth.token);
+      const activeCatalogue = isValidCatalogue(catalogue) ? catalogue : null;
+
+      if (activeCatalogue) {
+        // Update existing catalogue - backend auto replaces with POST
+        const debugFile = fileList[0]?.originFileObj as File | undefined;
+        console.log('Catalogue update payload:', {
+          title: values.title,
+          file: debugFile
+            ? { name: fileList[0]?.name, size: debugFile.size, type: debugFile.type }
+            : null,
+        });
+        
+        // Backend auto replaces when POST is called
+        if (fileList.length === 0 || !fileList[0].originFileObj) {
+          message.error('Please upload a PDF file');
+          setUploading(false);
+          return;
+        }
+        await createCatalogue(formData, auth.token);
         message.success('Catalogue updated successfully');
       } else {
-        // Create new catalogue
+        // Create new catalogue (POST)
+        // File is required when creating
+        if (fileList.length === 0 || !fileList[0].originFileObj) {
+          message.error('Please upload a PDF file');
+          setUploading(false);
+          return;
+        }
         await createCatalogue(formData, auth.token);
         message.success('Catalogue uploaded successfully');
       }
@@ -153,7 +172,7 @@ const CatalogsPage = () => {
   };
 
   const handleDelete = async () => {
-    if (!catalogue) return;
+    if (!catalogue?.id || catalogue.id === 'undefined') return;
     
     try {
       await deleteCatalogue(catalogue.id, auth!.token);
@@ -173,7 +192,7 @@ const CatalogsPage = () => {
   };
 
   const handleDownload = () => {
-    if (!catalogue) return;
+    if (!catalogue?.fileUrl) return;
     
     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}${catalogue.fileUrl}`;
     const link = document.createElement('a');
@@ -187,6 +206,8 @@ const CatalogsPage = () => {
 
   if (!ready) return null;
 
+  const activeCatalogue = isValidCatalogue(catalogue) ? catalogue : null;
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -194,7 +215,7 @@ const CatalogsPage = () => {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Product Catalog</h1>
           <p className="text-gray-600">Manage your product catalog PDF file</p>
         </div>
-        {!catalogue && (
+        {!activeCatalogue && (
           <Button
             type="primary"
             icon={<CloudUploadOutlined />}
@@ -208,7 +229,7 @@ const CatalogsPage = () => {
       </div>
 
       <Spin spinning={loading} indicator={<LoadingOutlined style={{ fontSize: 24 }} />}>
-        {catalogue ? (
+        {activeCatalogue ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Main Content */}
             <div className="lg:col-span-2">
@@ -224,29 +245,33 @@ const CatalogsPage = () => {
               >
                 <Descriptions column={1} bordered>
                   <Descriptions.Item label="Title">
-                    <span className="font-medium">{catalogue.title || 'Untitled'}</span>
+                    <span className="font-medium">{activeCatalogue.title || 'Untitled'}</span>
                   </Descriptions.Item>
                   <Descriptions.Item label="File Name">
-                    {catalogue.fileUrl.split('/').pop()}
+                    {activeCatalogue.fileUrl.split('/').pop() || 'N/A'}
                   </Descriptions.Item>
                   <Descriptions.Item label="File URL">
-                    <a 
-                      href={`${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}${catalogue.fileUrl}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      {`${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}${catalogue.fileUrl}`}
-                    </a>
+                    {activeCatalogue.fileUrl ? (
+                      <a 
+                        href={`${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}${activeCatalogue.fileUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        {`${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}${activeCatalogue.fileUrl}`}
+                      </a>
+                    ) : (
+                      <span className="text-gray-400">No file URL</span>
+                    )}
                   </Descriptions.Item>
-                  {catalogue.createdAt && (
+                  {activeCatalogue.createdAt && (
                     <Descriptions.Item label="Upload Date">
-                      {dayjs(catalogue.createdAt).format('MMMM DD, YYYY HH:mm')}
+                      {dayjs(activeCatalogue.createdAt).format('MMMM DD, YYYY HH:mm')}
                     </Descriptions.Item>
                   )}
-                  {catalogue.updatedAt && (
+                  {activeCatalogue.updatedAt && (
                     <Descriptions.Item label="Last Updated">
-                      {dayjs(catalogue.updatedAt).format('MMMM DD, YYYY HH:mm')}
+                      {dayjs(activeCatalogue.updatedAt).format('MMMM DD, YYYY HH:mm')}
                     </Descriptions.Item>
                   )}
                 </Descriptions>
@@ -315,8 +340,8 @@ const CatalogsPage = () => {
       <Modal
         title={
           <div className="flex items-center gap-2">
-            {catalogue ? <EditOutlined /> : <CloudUploadOutlined />}
-            <span>{catalogue ? 'Update Catalog' : 'Upload New Catalog'}</span>
+            {activeCatalogue ? <EditOutlined /> : <CloudUploadOutlined />}
+            <span>{activeCatalogue ? 'Update Catalog' : 'Upload New Catalog'}</span>
           </div>
         }
         open={isModalOpen}
@@ -324,8 +349,8 @@ const CatalogsPage = () => {
         onCancel={handleCancel}
         confirmLoading={uploading}
         width={600}
-        okText={catalogue ? 'Update' : 'Upload'}
-        okButtonProps={{ className: 'bg-green-600' }}
+        okText={activeCatalogue ? 'Update Catalog' : 'Add Catalog'}
+        okButtonProps={{ className: activeCatalogue ? 'bg-blue-600' : 'bg-green-600' }}
       >
         <Form form={form} layout="vertical" className="mt-4">
           <Form.Item
@@ -337,9 +362,14 @@ const CatalogsPage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Catalog File (PDF)"
-            rules={[{ required: !catalogue, message: 'Please upload PDF file' }]}
+            label={activeCatalogue ? "Catalog File (PDF) - Required for Update" : "Catalog File (PDF)"}
+            rules={[{ required: true, message: 'Please upload PDF file' }]}
           >
+            {activeCatalogue && (
+              <div className="mb-3 p-2 bg-gray-100 rounded text-sm">
+                <strong>Current file:</strong> {activeCatalogue.fileUrl.split('/').pop()}
+              </div>
+            )}
             <Upload
               fileList={fileList}
               onChange={handleUploadChange}
@@ -349,7 +379,7 @@ const CatalogsPage = () => {
               listType="text"
             >
               <Button icon={<UploadOutlined />} size="large" className="w-full">
-                {catalogue ? 'Click to Replace PDF' : 'Click to Upload PDF'}
+                {activeCatalogue ? 'Click to Upload New PDF' : 'Click to Upload PDF'}
               </Button>
             </Upload>
           </Form.Item>
@@ -359,7 +389,11 @@ const CatalogsPage = () => {
             <ul className="list-disc list-inside ml-2 space-y-1">
               <li>Only PDF files are accepted</li>
               <li>Maximum file size is 50MB</li>
-              {catalogue && <li>New file will replace the existing catalog</li>}
+              {activeCatalogue ? (
+                <li>Upload new PDF to replace the current catalog file</li>
+              ) : (
+                <li>PDF file is required for new catalog</li>
+              )}
             </ul>
           </div>
         </Form>

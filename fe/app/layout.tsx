@@ -6,6 +6,7 @@ import './globals.css';
 import theme from './theme/themeConfig';
 import ScrollToTop from '@/app/components/ScrollToTop';
 import { LanguageProvider } from '@/app/providers/LanguageProvider';
+import GoogleTranslateProvider from './providers/GoogleTranslateProvider';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -24,6 +25,7 @@ const RootLayout = ({ children }: React.PropsWithChildren) => (
     <body suppressHydrationWarning>
       <AntdRegistry>
         <LanguageProvider>
+        <GoogleTranslateProvider />
           <ConfigProvider theme={theme}>
             <AntdApp>
               {children}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   Language, 
   Translations, 
@@ -23,32 +24,70 @@ interface LanguageProviderProps {
 }
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>(defaultLanguage);
-  const [isLoading, setIsLoading] = useState(true);
+  const pathname = usePathname();
+  const router = useRouter();
+  const supportedLangs: Language[] = ['en', 'id'];
 
-  // Load saved language preference on mount
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null;
-    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'id')) {
-      setLanguageState(savedLanguage);
-    } else {
-      // Try to detect browser language
-      const browserLang = navigator.language.toLowerCase();
-      if (browserLang.startsWith('id')) {
-        setLanguageState('id');
-      }
+  const getLangFromPath = (path: string): Language | null => {
+    const seg = path.split('/')[1];
+    return supportedLangs.includes(seg as Language) ? (seg as Language) : null;
+  };
+
+  const stripLangFromPath = (path: string): string => {
+    const seg = path.split('/')[1];
+    if (supportedLangs.includes(seg as Language)) {
+      const rest = path.split('/').slice(2).join('/');
+      return rest ? `/${rest}` : '/';
     }
-    setIsLoading(false);
-  }, []);
+    return path || '/';
+  };
 
-  // Save language preference when it changes
-  const setLanguage = useCallback((lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
-    
-    // Update document language attribute
-    document.documentElement.lang = lang;
-  }, []);
+  const setLangCookie = (lang: Language) => {
+    document.cookie = `lang=${lang};path=/`;
+    document.cookie = `lang=${lang};path=/;domain=${window.location.hostname}`;
+  };
+
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window === 'undefined') return defaultLanguage;
+    const pathLang = getLangFromPath(window.location.pathname);
+    if (pathLang) return pathLang;
+    const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null;
+    if (savedLanguage === 'en' || savedLanguage === 'id') return savedLanguage;
+    const browserLang = navigator.language.toLowerCase();
+    return browserLang.startsWith('id') ? 'id' : defaultLanguage;
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
+  // Sync language from URL prefix
+  useEffect(() => {
+    const pathLang = pathname ? getLangFromPath(pathname) : null;
+    if (pathLang && pathLang !== language) {
+      setLanguageState(pathLang);
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, pathLang);
+      setLangCookie(pathLang);
+    }
+  }, [pathname, language]);
+
+  // Save language preference when it changes and update URL
+  const setLanguage = useCallback(
+    (lang: Language) => {
+      setLanguageState(lang);
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+      setLangCookie(lang);
+
+      const currentPath = window.location.pathname;
+      const pathWithoutLang = stripLangFromPath(currentPath);
+      const targetPath = pathWithoutLang === '/' ? `/${lang}` : `/${lang}${pathWithoutLang}`;
+      if (currentPath !== targetPath) {
+        router.push(targetPath);
+      }
+    },
+    [router]
+  );
 
   // Memoized translations object
   const t = useMemo(() => translations[language], [language]);

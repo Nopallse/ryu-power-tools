@@ -49,14 +49,14 @@ const LoginPage = () => {
             label="Email"
             rules={[{ required: true, message: "Please enter your email" }, { type: "email", message: "Invalid email" }]}
           >
-            <Input size="large" prefix={<MailOutlined />} placeholder="admin@ryu.com" />
+            <Input size="large" prefix={<MailOutlined />} />
           </Form.Item>
           <Form.Item
             name="password"
             label="Password"
             rules={[{ required: true, message: "Please enter your password" }]}
           >
-            <Input.Password size="large" prefix={<LockOutlined />} placeholder="••••••••" />
+            <Input.Password size="large" prefix={<LockOutlined />} />
           </Form.Item>
           <Button type="primary" htmlType="submit" block size="large" className="bg-green-600 hover:bg-green-700">
             Login

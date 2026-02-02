@@ -21,7 +21,7 @@ export function useAuthGuard(bypassPaths: string[] = DEFAULT_BYPASS) {
     const session = getStoredAuth();
     console.log('useAuthGuard - getStoredAuth result:', session);
     if (!session && !allowedWithoutAuth) {
-      router.replace("/login");
+      router.replace("/log8i8n738");
       setReady(true);
       return;
     }

@@ -58,7 +58,7 @@
  *          const data = await response.clone().json();
  *          if (data?.message === "Unauthorized") {
  *            clearStoredAuth();
- *            router.push("/login");
+ *            router.push("/log8i8n738");
  *            return true;
  *          }
  *        } catch {}

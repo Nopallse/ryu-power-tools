@@ -114,13 +114,14 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   if (!auth) return null;
 
   return (
-    <Layout className="min-h-screen">
+    <Layout className="min-h-screen" style={{ minHeight: '100vh' }}>
       <Sider
         trigger={null}
         collapsible
         collapsed={collapsed}
         className="!bg-white border-r border-gray-200"
         width={260}
+        style={{ minHeight: '100vh' }}
       >
         <div className="h-16 flex items-center justify-center border-b border-gray-200 px-4">
           {!collapsed ? (
@@ -149,7 +150,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         />
       </Sider>
 
-      <Layout>
+      <Layout style={{ minHeight: '100vh' }}>
         <Header className="!bg-white border-b border-gray-200 px-6 flex items-center justify-between">
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -168,7 +169,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           </Dropdown>
         </Header>
 
-        <Content className="m-6 p-6 bg-gray-50 rounded-lg min-h-[calc(100vh-88px)]">
+        <Content className="m-6 p-6 bg-gray-50 rounded-lg" style={{ minHeight: 'calc(100vh - 88px)' }}>
           {children}
         </Content>
       </Layout>

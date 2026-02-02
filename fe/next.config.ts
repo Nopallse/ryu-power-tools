@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ryu.pariamankota.tech',
+        hostname: 'https://nest-api.ryupowertools.com',
       },
       {
         protocol: 'http',
