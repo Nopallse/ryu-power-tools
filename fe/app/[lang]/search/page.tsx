@@ -13,7 +13,7 @@ import { useLanguage } from '@/app/providers/LanguageProvider';
 const SearchContent: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const query = searchParams.get('q') || '';
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
 
@@ -76,7 +76,7 @@ const SearchContent: React.FC = () => {
         {!loading && products.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {products.map((product) => (
-              <Link href={`/product/${product.id}`} key={product.id}>
+              <Link href={`/${language}/product/${product.id}`} key={product.id}>
                 <div className="flex flex-col items-center">
                   <Card
                     hoverable
@@ -129,7 +129,7 @@ const SearchContent: React.FC = () => {
             }
             style={{ marginTop: '60px', marginBottom: '60px' }}
           >
-            <Link href="/">
+            <Link href={`/${language}`}>
               <Button type="primary" size="large" className="bg-[#2d5016] hover:bg-[#3d7a3e]">
                 {t.common.back}
               </Button>

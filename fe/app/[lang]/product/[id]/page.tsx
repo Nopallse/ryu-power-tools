@@ -375,7 +375,7 @@ export default function ProductDetailPage() {
               const itemImageUrl = getImageUrl(itemImage.url);
 
               return (
-                <Link href={`/${language}/product/id/${item.id}`} key={item.id}>
+                <Link href={`/${language}/product/${item.id}`} key={item.id}>
                   <div className="flex flex-col h-full items-center justify-between">
                     <div className="bg-white border-3 border-[#2d6a2e] flex items-center justify-center aspect-square w-full overflow-hidden ">
                       <img

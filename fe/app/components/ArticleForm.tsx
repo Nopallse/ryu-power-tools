@@ -32,7 +32,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ open, onClose, onSubmit, arti
 
   const isEdit = !!article;
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://https://nest-api.ryupowertools.com';
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://nest-api.ryupowertools.com';
 
   // Helper function to replace localhost with correct API_BASE in image URLs
   const addBaseUrlToImages = (html: string): string => {

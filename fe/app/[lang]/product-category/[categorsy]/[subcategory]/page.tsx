@@ -5,6 +5,7 @@ import { Card, Button, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import Image from "next/image";
+import { useLanguage } from "@/app/providers/LanguageProvider";
 import type { Product } from "@/app/lib/product-api";
 import type { Category } from "@/app/lib/category-api";
 import { getPublicProductsByCategorySlug } from "@/app/lib/product-api";
@@ -21,6 +22,7 @@ const ProductCategoryPage: React.FC<ProductCategoryPageProps> = ({
   params,
 }) => {
   const { categorsy, subcategory } = use(params);
+  const { language } = useLanguage();
   const apiBase =
     process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
@@ -96,7 +98,7 @@ const ProductCategoryPage: React.FC<ProductCategoryPageProps> = ({
 
   const getImageUrl = (imageUrl?: string): string => {
     if (!imageUrl) return "/images/product.jpg";
-    return imageUrl.startsWith("http") ? imageUrl : `https://https://nest-api.ryupowertools.com${imageUrl}`;
+    return imageUrl.startsWith("http") ? imageUrl : `https://nest-api.ryupowertools.com${imageUrl}`;
   };
 
   const getProductImageUrl = (product: Product): string => {
@@ -135,7 +137,7 @@ const ProductCategoryPage: React.FC<ProductCategoryPageProps> = ({
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {subcategories.map((subcat) => (
               <Link
-                href={`/product-category/${categorsy}/${subcategory}/${subcat.slug}`}
+                href={`/${language}/product-category/${categorsy}/${subcategory}/${subcat.slug}`}
                 key={subcat.id}
               >
                 <div className="flex flex-col items-center">
@@ -189,7 +191,7 @@ const ProductCategoryPage: React.FC<ProductCategoryPageProps> = ({
         {!loading && viewMode === "products" && products.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {products.map((product) => (
-              <Link href={`/product/${product.id}`} key={product.id}>
+              <Link href={`/${language}/product/${product.id}`} key={product.id}>
                 <div className="flex flex-col items-center">
                   <Card
                     hoverable

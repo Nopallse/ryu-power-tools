@@ -5,6 +5,7 @@ import { Card, Button, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import Image from "next/image";
+import { useLanguage } from "@/app/providers/LanguageProvider";
 import type { Product } from "@/app/lib/product-api";
 import type { Category, CategoryWithChildren } from "@/app/lib/category-api";
 import { getPublicProductsByCategorySlug } from "@/app/lib/product-api";
@@ -21,6 +22,7 @@ interface CategoryPageProps {
 
 const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
   const { slugs } = use(params);
+  const { language } = useLanguage();
   const categorySlug = slugs[slugs.length - 1];
   const apiBase =
     process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
@@ -120,7 +122,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {subcategories.map((subcat) => (
               <Link
-                href={`/product-category/${categoryPath}/${subcat.slug}`}
+                href={`/${language}/product-category/${categoryPath}/${subcat.slug}`}
                 key={subcat.id}
               >
                 <div className="flex flex-col items-center">
@@ -174,7 +176,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
         {!loading && viewMode === "products" && products.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {products.map((product) => (
-              <Link href={`/product/${product.id}`} key={product.id}>
+              <Link href={`/${language}/product/${product.id}`} key={product.id}>
                 <div className="flex flex-col items-center">
                   <Card
                     hoverable

@@ -28,13 +28,20 @@ export function middleware(request: NextRequest) {
     normalizedLang = 'id';
   }
 
-  // If URL already has language prefix, rewrite to internal path without prefix
+  // If URL already has language prefix, continue without rewrite.
+  // Normalize /in to /id via redirect to keep URLs canonical.
   if (SUPPORTED_LANGS.includes(maybeLang)) {
-    const url = request.nextUrl.clone();
-    const rest = segments.slice(2).join('/');
-    url.pathname = rest ? `/${rest}` : '/';
+    if (normalizedLang !== maybeLang) {
+      const url = request.nextUrl.clone();
+      const rest = segments.slice(2).join('/');
+      url.pathname = rest ? `/${normalizedLang}/${rest}` : `/${normalizedLang}`;
 
-    const response = NextResponse.rewrite(url);
+      const response = NextResponse.redirect(url);
+      response.cookies.set('lang', normalizedLang, { path: '/' });
+      return response;
+    }
+
+    const response = NextResponse.next();
     response.cookies.set('lang', normalizedLang, { path: '/' });
     return response;
   }

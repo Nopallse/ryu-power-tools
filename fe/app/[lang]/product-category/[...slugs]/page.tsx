@@ -124,7 +124,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
 
   const getImageUrl = (imageUrl?: string): string => {
     if (!imageUrl) return "/images/product.jpg";
-    return imageUrl.startsWith("http") ? imageUrl : `https://https://nest-api.ryupowertools.com${imageUrl}`;
+    return imageUrl.startsWith("http") ? imageUrl : `https://nest-api.ryupowertools.com${imageUrl}`;
   };
 
   const getProductImageUrl = (product: Product): string => {
@@ -220,7 +220,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ params }) => {
         {!loading && viewMode === "products" && (translatedProducts?.items || products).length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {(translatedProducts?.items || products).map((product: any) => (
-              <Link href={`/${language}/product/id/${product.id}`} key={product.id}>
+              <Link href={`/${language}/product/${product.id}`} key={product.id}>
                 <div className="flex flex-col items-center">
                   <Card
                     hoverable

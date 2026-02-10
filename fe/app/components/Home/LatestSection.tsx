@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/app/providers/LanguageProvider';
 
 export default function LatestSection() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -90,7 +90,7 @@ export default function LatestSection() {
                     {product.name}
                   </h3>
                     <div className="w-full flex justify-center">
-                      <Link href={`/product/${product.id}`} className="w-full flex justify-center">
+                      <Link href={`/${language}/product/${product.id}`} className="w-full flex justify-center">
                       <Button 
                         type="primary"
                         className="!bg-[#2d6a2e] hover:!bg-[#3d8a3e] !border-none !rounded !h-10 font-semibold !px-6 mt-auto mx-auto block"

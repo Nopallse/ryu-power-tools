@@ -23,15 +23,37 @@ export function useTranslatedData<T extends Record<string, any>>(
   const previousDataRef = useRef<T | null>(null);
   const previousLanguageRef = useRef<Language>(targetLanguage);
 
+  const fieldsKey = (fieldsToTranslate ?? []).join("|");
+
+  const buildSignature = (value: T | null | undefined): string => {
+    if (!value) return "null";
+
+    const asAny = value as any;
+    if (typeof asAny.id === "string" || typeof asAny.id === "number") {
+      return `id:${asAny.id}:${asAny.updatedAt ?? ""}`;
+    }
+
+    if (Array.isArray(asAny.items)) {
+      const ids = asAny.items
+        .map((item: any) => `${item?.id ?? ""}:${item?.updatedAt ?? ""}`)
+        .join(",");
+      return `items:${asAny.items.length}:${ids}`;
+    }
+
+    return "object";
+  };
+
   useEffect(() => {
     if (!data) {
       setTranslated(null);
       return;
     }
 
+    const signature = buildSignature(data);
+
     // Jika data atau language tidak berubah, skip
     if (
-      previousDataRef.current === data &&
+      buildSignature(previousDataRef.current) === signature &&
       previousLanguageRef.current === targetLanguage
     ) {
       return;
@@ -73,7 +95,7 @@ export function useTranslatedData<T extends Record<string, any>>(
     };
 
     performTranslation();
-  }, [data, targetLanguage, fieldsToTranslate]);
+  }, [data, targetLanguage, fieldsKey]);
 
   return {
     translated,

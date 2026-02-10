@@ -75,11 +75,11 @@ const Navbar: React.FC = () => {
   const menuItems = useMemo((): MenuProps['items'] => [
     {
       key: 'home',
-      label: <Link href="/">{t.nav.home}</Link>,
+      label: <Link href={`/${language}`}>{t.nav.home}</Link>,
     },
     {
       key: 'blog',
-      label: <Link href="/blog">{t.nav.blog}</Link>,
+      label: <Link href={`/${language}/blog`}>{t.nav.blog}</Link>,
     },
     {
       key: 'category',
@@ -120,8 +120,8 @@ const Navbar: React.FC = () => {
         </span>
       ),
       children: [
-        { key: 'service-center', label: <Link href="/service-center">{t.nav.serviceCenter}</Link> },
-        { key: 'where-to-buy', label: <Link href="/where-to-buy">{t.nav.whereToBuy}</Link> },
+        { key: 'service-center', label: <Link href={`/${language}/service-center`}>{t.nav.serviceCenter}</Link> },
+        { key: 'where-to-buy', label: <Link href={`/${language}/where-to-buy`}>{t.nav.whereToBuy}</Link> },
         { 
           key: 'altama-ecare', 
           label: (
@@ -134,11 +134,11 @@ const Navbar: React.FC = () => {
             </a>
           )
         },
-        { key: 'contact', label: <Link href="/contact">{t.nav.contact}</Link> },
-        { key: 'warranty', label: <Link href="/warranty">{t.nav.warranty}</Link> },
+        { key: 'contact', label: <Link href={`/${language}/contact`}>{t.nav.contact}</Link> },
+        { key: 'warranty', label: <Link href={`/${language}/warranty`}>{t.nav.warranty}</Link> },
       ],
     },
-  ], [t, categoryItems, catalogueUrl]);
+  ], [t, categoryItems, catalogueUrl, language]);
 
   // Helper function to find menu key by pathname
   const findMenuKeyByPath = (items: MenuProps['items'], path: string, parentKeys: string[] = []): { key: string | null; parents: string[] } => {
@@ -148,7 +148,7 @@ const Navbar: React.FC = () => {
       const menuItem = item as any;
       if (menuItem.label && typeof menuItem.label === 'object') {
         const href = menuItem.label.props?.href;
-        if (href && path === href) {
+        if (href && normalizePathForMenu(path) === normalizePathForMenu(href)) {
           return { key: menuItem.key, parents: parentKeys };
         }
       }
@@ -162,21 +162,28 @@ const Navbar: React.FC = () => {
     return { key: null, parents: [] };
   };
 
+  const normalizePathForMenu = (path: string) => {
+    const normalized = path.replace(/^\/(en|id|in)(?=\/|$)/, '');
+    return normalized === '' ? '/' : normalized;
+  };
+
   // Update selected keys based on pathname
   useEffect(() => {
-    if (pathname === '/') {
+    const pathForMatch = normalizePathForMenu(pathname);
+
+    if (pathForMatch === '/') {
       setSelectedKeys(['home']);
-    } else if (pathname.startsWith('/blog')) {
+    } else if (pathForMatch.startsWith('/blog')) {
       setSelectedKeys(['blog']);
-    } else if (pathname.startsWith('/service-center')) {
+    } else if (pathForMatch.startsWith('/service-center')) {
       setSelectedKeys(['service-center']);
-    } else if (pathname.startsWith('/where-to-buy')) {
+    } else if (pathForMatch.startsWith('/where-to-buy')) {
       setSelectedKeys(['where-to-buy']);
-    } else if (pathname.startsWith('/contact')) {
+    } else if (pathForMatch.startsWith('/contact')) {
       setSelectedKeys(['contact']);
-    } else if (pathname.startsWith('/warranty')) {
+    } else if (pathForMatch.startsWith('/warranty')) {
       setSelectedKeys(['warranty']);
-    } else if (pathname.startsWith('/product-category')) {
+    } else if (pathForMatch.startsWith('/product-category')) {
       const result = findMenuKeyByPath(menuItems, pathname);
       if (result.key) {
         setSelectedKeys([result.key]);
@@ -207,7 +214,7 @@ const Navbar: React.FC = () => {
     return categories.map((cat) => {
       const hasChildren = cat.children && cat.children.length > 0;
       const currentPath = parentPath ? `${parentPath}/${cat.slug}` : cat.slug;
-      const fullPath = `/product-category/${currentPath}`;
+      const fullPath = `/${language}/product-category/${currentPath}`;
       
       return {
         key: cat.id,
@@ -228,7 +235,7 @@ const Navbar: React.FC = () => {
     if (e && e.key !== 'Enter') return;
     if (!searchQuery.trim()) return;
 
-    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    router.push(`/${language}/search?q=${encodeURIComponent(searchQuery)}`);
     setSearchQuery('');
     setSearchVisible(false);
   };
