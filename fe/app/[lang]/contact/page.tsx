@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Input, Select } from 'antd';
+import { Input, Select, message } from 'antd';
 import { useLanguage } from '@/app/providers/LanguageProvider';
+import { submitGeneralContact, submitEventContact } from '@/app/lib/contact-api';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -27,16 +28,77 @@ const ContactPage = () => {
     message: '',
   });
 
-  const handleGeneralSubmit = (e: React.FormEvent) => {
+  const [generalLoading, setGeneralLoading] = useState(false);
+  const [eventLoading, setEventLoading] = useState(false);
+
+  const handleGeneralSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('General form submitted:', generalForm);
-    // Add your form submission logic here
+    setGeneralLoading(true);
+
+    try {
+      const payload = {
+        contact_type: generalForm.type,
+        name: generalForm.name,
+        phone: generalForm.phone,
+        email: generalForm.email,
+        city: generalForm.city,
+        message: generalForm.message,
+      };
+
+      await submitGeneralContact(payload);
+      message.success(t.contact.successMessage || 'Your message has been sent successfully!');
+      
+      // Reset form
+      setGeneralForm({
+        type: 'Customer Care',
+        name: '',
+        phone: '',
+        email: '',
+        city: '',
+        message: '',
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred while submitting the form';
+      message.error(errorMessage);
+      console.error('Error submitting general contact form:', error);
+    } finally {
+      setGeneralLoading(false);
+    }
   };
 
-  const handleEventSubmit = (e: React.FormEvent) => {
+  const handleEventSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Event form submitted:', eventForm);
-    // Add your form submission logic here
+    setEventLoading(true);
+
+    try {
+      const payload = {
+        event_type: eventForm.type,
+        name: eventForm.name,
+        phone: eventForm.phone,
+        email: eventForm.email,
+        city: eventForm.city,
+        message: eventForm.message,
+      };
+
+      await submitEventContact(payload);
+      message.success(t.contact.successMessage || 'Your event inquiry has been sent successfully!');
+      
+      // Reset form
+      setEventForm({
+        type: 'OFFLINE',
+        name: '',
+        phone: '',
+        email: '',
+        city: '',
+        message: '',
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred while submitting the form';
+      message.error(errorMessage);
+      console.error('Error submitting event contact form:', error);
+    } finally {
+      setEventLoading(false);
+    }
   };
 
   return (
@@ -166,9 +228,10 @@ const ContactPage = () => {
             <div className="flex justify-center sm:justify-end">
               <button
                 type="submit"
-                className="px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
+                disabled={generalLoading}
+                className="px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {t.contact.send}
+                {generalLoading ? t.common.loading || 'Loading...' : t.contact.send}
               </button>
             </div>
           </form>
@@ -270,9 +333,10 @@ const ContactPage = () => {
             <div className="flex justify-center sm:justify-end">
               <button
                 type="submit"
-                className="px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
+                disabled={eventLoading}
+                className="px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {t.contact.send}
+                {eventLoading ? t.common.loading || 'Loading...' : t.contact.send}
               </button>
             </div>
           </form>

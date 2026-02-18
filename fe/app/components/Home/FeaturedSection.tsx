@@ -8,7 +8,7 @@ import { useLanguage } from '@/app/providers/LanguageProvider';
 import type { Category } from '@/app/lib/category-api';
 
 export default function FeaturedSection() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -73,7 +73,7 @@ export default function FeaturedSection() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {categories.map((category) => (
                 <div key={category.id} className="flex flex-col h-full">
-                  <Link href={`/category/${category.slug}`}>
+                  <Link href={`/${language}/category/${category.slug}`}>
                     <div className="overflow-hidden rounded-none mb-4 shadow-md hover:scale-110 transition-transform duration-500">
                     <img
                       src={getImageUrl(category.imageUrl)}

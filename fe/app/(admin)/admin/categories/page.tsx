@@ -200,13 +200,13 @@ export default function CategoriesPage() {
       width: 150,
     },
     {
-      title: 'Parent Category',
+      title: 'Category Type',
       dataIndex: 'parentId',
       key: 'parentId',
       render: (parentId: string | null) => {
-        if (!parentId) return '-';
+        if (!parentId) return 'Parent';
         const parent = categories.find((cat) => cat.id === parentId);
-        return parent?.name || '-';
+        return `Sub (Parent: ${parent?.name || 'Unknown'})`;
       },
     },
     {

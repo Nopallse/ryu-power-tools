@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/app/providers/LanguageProvider';
 
 export default function CTASection() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <section className="bg-[#61a86a] min-h-80">
@@ -20,7 +20,7 @@ export default function CTASection() {
             <h2 className="max-w-3xl font-anton text-4xl lg:text-5xl uppercase normal-case no-underline leading-[1.2em] tracking-[4.25px] text-black mb-6">
               {t.home.ctaTitle}
             </h2>
-            <Link href="/contact" className="!text-black text-sm font-thin">
+            <Link href={`/${language}/contact`} className="!text-black text-sm font-thin">
               {t.home.ctaLink}
             </Link>
           </div>

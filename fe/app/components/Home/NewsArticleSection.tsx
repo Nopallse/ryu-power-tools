@@ -9,7 +9,7 @@ import type { Article } from '@/app/lib/article-api';
 import dayjs from 'dayjs';
 
 export default function NewsArticleSection() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -80,7 +80,7 @@ export default function NewsArticleSection() {
             {articles.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {articles.map((article) => (
-                  <Link href={`/blog/${article.id}`} key={article.id}>
+                  <Link href={`/${language}/blog/${article.id}`} key={article.id}>
                     <div className="flex flex-col h-full group cursor-pointer bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                       <div className="overflow-hidden">
                         <img 

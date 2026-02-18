@@ -36,6 +36,40 @@ export type Product = {
   productImages: ProductImage[];
 };
 
+type ApiCategory = { id: string; name: string; slug?: string };
+
+const normalizeProduct = (
+  product: Product & {
+    images?: ProductImage[];
+    categories?: ApiCategory[][] | ApiCategory[];
+  }
+) => {
+  const rawImages = product.productImages?.length
+    ? product.productImages
+    : product.images || [];
+
+  const rawCategories = product.productCategory?.length
+    ? product.productCategory
+    : Array.isArray(product.categories)
+      ? product.categories.flat()
+      : [];
+
+  const normalizedCategories = Array.isArray(rawCategories)
+    ? rawCategories.map((cat: any) => ({
+        categoryId: cat.categoryId ?? cat.id ?? "",
+        category: {
+          name: cat.category?.name ?? cat.name ?? "",
+        },
+      }))
+    : [];
+
+  return {
+    ...product,
+    productImages: rawImages.map(normalizeImage),
+    productCategory: normalizedCategories,
+  } as Product;
+};
+
 export async function getProducts(token: string): Promise<Product[]> {
   const response = await fetch(`${API_BASE}/product`, {
     headers: {
@@ -49,11 +83,10 @@ export async function getProducts(token: string): Promise<Product[]> {
 
   const result = await response.json();
   const products = result.data || result;
-  
-  return products.map((product: Product) => ({
-    ...product,
-    productImages: (product.productImages || []).map(normalizeImage),
-  }));
+
+  return products.map((product: Product & { images?: ProductImage[] }) =>
+    normalizeProduct(product)
+  );
 }
 
 export async function getProductById(id: string, token: string): Promise<Product> {
@@ -69,11 +102,8 @@ export async function getProductById(id: string, token: string): Promise<Product
 
   const result = await response.json();
   const product = result.data || result;
-  
-  return {
-    ...product,
-    productImages: (product.productImages || []).map(normalizeImage),
-  };
+
+  return normalizeProduct(product);
 }
 
 export async function createProduct(
@@ -168,10 +198,9 @@ export async function getPublicLatestProducts(limit?: number): Promise<Product[]
     products = products.slice(0, limit);
   }
   
-  return products.map((product: Product) => ({
-    ...product,
-    productImages: (product.productImages || []).map(normalizeImage),
-  }));
+  return products.map((product: Product & { images?: ProductImage[] }) =>
+    normalizeProduct(product)
+  );
 }
 
 export async function getPublicProductById(id: string): Promise<Product> {
@@ -183,11 +212,8 @@ export async function getPublicProductById(id: string): Promise<Product> {
 
   const result = await response.json();
   const product = result.data || result;
-  
-  return {
-    ...product,
-    productImages: (product.productImages || []).map(normalizeImage),
-  };
+
+  return normalizeProduct(product);
 }
 
 export async function getPublicProductBySlug(slug: string): Promise<Product> {
@@ -199,11 +225,8 @@ export async function getPublicProductBySlug(slug: string): Promise<Product> {
 
   const result = await response.json();
   const product = result.data || result;
-  
-  return {
-    ...product,
-    productImages: (product.productImages || []).map(normalizeImage),
-  };
+
+  return normalizeProduct(product);
 }
 
 export async function getPublicProductsByCategorySlug(slug: string): Promise<Product[]> {
@@ -215,11 +238,10 @@ export async function getPublicProductsByCategorySlug(slug: string): Promise<Pro
 
   const result = await response.json();
   const products = result.data || result;
-  
-  return products.map((product: Product) => ({
-    ...product,
-    productImages: (product.productImages || []).map(normalizeImage),
-  }));
+
+  return products.map((product: Product & { images?: ProductImage[] }) =>
+    normalizeProduct(product)
+  );
 }
 
 export async function searchPublicProducts(query: string): Promise<Product[]> {
@@ -231,11 +253,10 @@ export async function searchPublicProducts(query: string): Promise<Product[]> {
 
   const result = await response.json();
   const products = result.data || result;
-  
-  return products.map((product: Product) => ({
-    ...product,
-    productImages: (product.productImages || []).map(normalizeImage),
-  }));
+
+  return products.map((product: Product & { images?: ProductImage[] }) =>
+    normalizeProduct(product)
+  );
 }
 
 async function safeErrorMessage(response: Response): Promise<string | null> {

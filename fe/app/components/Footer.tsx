@@ -8,28 +8,28 @@ import { useLanguage } from "@/app/providers/LanguageProvider";
 const socialIcons = [
   {
     icon: "/images/icon/facebook.png",
-    link: "https://facebook.com",
+    link: "https://facebook.com/ryupowertools.id",
     alt: "Facebook",
   },
   {
     icon: "/images/icon/instagram.png",
-    link: "https://instagram.com",
+    link: "https://instagram.com/ryupowertools/",
     alt: "Instagram",
   },
   {
     icon: "/images/icon/youtube.png",
-    link: "https://youtube.com",
+    link: "https://youtube.com/@ryupowertools1866",
     alt: "Youtube",
   },
   {
     icon: "/images/icon/tik-tok.png",
-    link: "https://tiktok.com",
+    link: "https://tiktok.com/@ryupowertools",
     alt: "TikTok",
   },
 ];
 
 export default function Footer() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [email, setEmail] = useState("");
 
   return (
@@ -94,7 +94,7 @@ export default function Footer() {
               <ul className="space-y-3">
                 <li>
                   <Link
-                    href="/store/tokopedia"
+                    href="https://tokopedia.com/ryuofficial"
                     style={{ color: "#000000" }}
                     className="text-black hover:text-[#2a6932] text-sm no-underline"
                   >
@@ -103,7 +103,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/store/shopee"
+                    href="https://shopee.co.id/ryuofficial"
                     style={{ color: "#000000" }}
                     className="text-black hover:text-[#2a6932] text-sm no-underline"
                   >
@@ -112,7 +112,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/store/monotaro"
+                    href="https://www.monotaro.id/shopbybrand/brand?brand=ryu"
                     style={{ color: "#000000" }}
                     className="text-black hover:text-[#2a6932] text-sm no-underline"
                   >
@@ -130,7 +130,7 @@ export default function Footer() {
               <ul className="space-y-3">
                 <li>
                   <Link
-                    href="/contact"
+                    href={`/${language}/contact`}
                     style={{ color: "#000000" }}
                     className="text-black hover:text-[#2a6932] text-sm no-underline"
                   >
@@ -139,7 +139,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/service-center"
+                    href={`/${language}/service-center`}
                     style={{ color: "#000000" }}
                     className="text-black hover:text-[#2a6932] text-sm no-underline"
                   >
@@ -148,7 +148,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/warranty"
+                    href={`/${language}/warranty`}
                     style={{ color: "#000000" }}
                     className="text-black hover:text-[#2a6932] text-sm no-underline"
                   >
@@ -157,7 +157,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/where-to-buy"
+                    href={`/${language}/where-to-buy`}
                     style={{ color: "#000000" }}
                     className="text-black hover:text-[#2a6932] text-sm no-underline"
                   >

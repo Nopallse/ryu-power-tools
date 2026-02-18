@@ -4,7 +4,7 @@ import { Button, Row, Col, Card } from "antd";
 import { useLanguage } from "@/app/providers/LanguageProvider";
 
 export default function AboutSection() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const categories = [
     {
@@ -111,7 +111,7 @@ export default function AboutSection() {
               <button
                 type="button"
                 className="px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-primary bg-primary text-white text-sm sm:text-base tracking-wide transition-colors hover:bg-transparent hover:text-[#2d5016] cursor-pointer"
-                onClick={() => (window.location.href = "/contact")}
+                onClick={() => (window.location.href = `/${language}/contact`)}
               >
                 {t.home.aboutCTA}
               </button>
