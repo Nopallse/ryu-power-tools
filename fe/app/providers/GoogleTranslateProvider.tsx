@@ -65,26 +65,55 @@ export default function GoogleTranslateProvider() {
 
   // Remove banner Google Translate
   useEffect(() => {
+    let cleaned = false;
+
     const removeBanner = () => {
-      // Remove iframe banner
-      const frames = document.querySelectorAll('iframe.goog-te-banner-frame, .goog-te-banner-frame');
-      frames.forEach(frame => frame.remove());
+      if (cleaned) return;
       
-      // Hide skiptranslate div
-      const topDiv = document.querySelector('.skiptranslate') as HTMLElement;
-      if (topDiv?.style) {
-        topDiv.style.display = 'none';
+      try {
+        // Remove iframe banner
+        const frames = document.querySelectorAll('iframe.goog-te-banner-frame, .goog-te-banner-frame');
+        frames.forEach(frame => {
+          try {
+            if (frame.parentNode) {
+              frame.parentNode.removeChild(frame);
+            }
+          } catch (e) {
+            // Ignore error if element already removed
+          }
+        });
+        
+        // Hide skiptranslate div
+        const topDiv = document.querySelector('.skiptranslate') as HTMLElement;
+        if (topDiv?.style) {
+          topDiv.style.display = 'none';
+        }
+        
+        // Reset body position
+        document.body.style.top = '0';
+        document.body.style.position = 'static';
+      } catch (e) {
+        // Silently ignore DOM errors
       }
-      
-      // Reset body position
-      document.body.style.top = '0';
-      document.body.style.position = 'static';
     };
 
-    const interval = setInterval(removeBanner, 100);
+    // Run once on mount and then use MutationObserver for efficiency
     removeBanner();
 
-    return () => clearInterval(interval);
+    const observer = new MutationObserver(() => {
+      removeBanner();
+    });
+
+    // Observe body for new Google Translate elements
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      cleaned = true;
+      observer.disconnect();
+    };
   }, []);
 
   return (
