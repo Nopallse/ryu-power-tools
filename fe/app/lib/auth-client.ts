@@ -10,8 +10,35 @@ export type AuthSession = {
 const STORAGE_KEY = "ryu-auth";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
+type JwtPayload = {
+  exp?: number;
+};
+
 function isBrowser() {
   return typeof window !== "undefined";
+}
+
+function decodeJwtPayload(token: string): JwtPayload | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+
+    const normalized = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const decoded = atob(padded);
+
+    return JSON.parse(decoded) as JwtPayload;
+  } catch {
+    return null;
+  }
+}
+
+export function isJwtExpired(token: string): boolean {
+  const payload = decodeJwtPayload(token);
+  if (!payload?.exp) return true;
+
+  const nowInSeconds = Math.floor(Date.now() / 1000);
+  return payload.exp <= nowInSeconds;
 }
 
 export function getStoredAuth(): AuthSession | null {
@@ -26,6 +53,10 @@ export function getStoredAuth(): AuthSession | null {
       return null;
     }
     const parsed = JSON.parse(raw) as AuthSession;
+    if (!parsed?.token || isJwtExpired(parsed.token)) {
+      clearStoredAuth();
+      return null;
+    }
     console.log('Retrieved auth from localStorage:', { id: parsed.id, email: parsed.email, hasToken: !!parsed.token });
     return parsed;
   } catch (error) {

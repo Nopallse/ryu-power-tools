@@ -19,7 +19,6 @@ export function useAuthGuard(bypassPaths: string[] = DEFAULT_BYPASS) {
 
   useEffect(() => {
     const session = getStoredAuth();
-    console.log('useAuthGuard - getStoredAuth result:', session);
     if (!session && !allowedWithoutAuth) {
       router.replace("/log8i8n738");
       setReady(true);
@@ -27,7 +26,7 @@ export function useAuthGuard(bypassPaths: string[] = DEFAULT_BYPASS) {
     }
     setAuth(session);
     setReady(true);
-  }, [allowedWithoutAuth, router]);
+  }, [pathname, allowedWithoutAuth, router]);
 
   return { auth, ready, allowedWithoutAuth };
 }

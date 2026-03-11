@@ -118,7 +118,7 @@ export default function BlogDetailPage() {
             <h3 className="text-2xl font-bold text-[#2d5016] mb-6">{t.blog.relatedArticles}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {(translatedRelated?.items || related).map((r: any) => (
-                <Link href={`/${language}/blog/id/${r.id}`} key={r.id}>
+                <Link href={`/${language}/blog/${r.id}`} key={r.id}>
                   <div className="flex flex-col h-full group cursor-pointer bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                     <div className="overflow-hidden">
                       <img
