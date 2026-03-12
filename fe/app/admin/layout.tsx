@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { Layout, Menu, Button, Spin, App } from 'antd';
 import {
   DashboardOutlined,
@@ -30,6 +30,21 @@ export default function AdminLayout({
   const router = useRouter();
   const { auth, ready } = useAuthGuard();
   const { message } = App.useApp();
+
+  useLayoutEffect(() => {
+    document.documentElement.setAttribute('translate', 'no');
+    document.documentElement.classList.add('notranslate');
+    document.body.setAttribute('translate', 'no');
+    document.body.classList.add('notranslate');
+
+    let meta = document.querySelector('meta[name="google"]') as HTMLMetaElement | null;
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'google');
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', 'notranslate');
+  }, []);
 
   const menuItems = [
     {
@@ -103,6 +118,7 @@ export default function AdminLayout({
   if (!auth) return null;
 
   return (
+    <div className="notranslate" translate="no">
     <Layout className="min-h-screen">
       <Sider
         trigger={null}
@@ -146,5 +162,6 @@ export default function AdminLayout({
         </Content>
       </Layout>
     </Layout>
+    </div>
   );
 }

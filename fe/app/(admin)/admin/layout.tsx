@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { Layout, Menu, Avatar, Dropdown, Space, Typography, Spin, App } from 'antd';
 import {
   DashboardOutlined,
@@ -31,6 +31,21 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const { auth, ready } = useAuthGuard();
   const { message } = App.useApp();
+
+  useLayoutEffect(() => {
+    document.documentElement.setAttribute('translate', 'no');
+    document.documentElement.classList.add('notranslate');
+    document.body.setAttribute('translate', 'no');
+    document.body.classList.add('notranslate');
+
+    let meta = document.querySelector('meta[name="google"]') as HTMLMetaElement | null;
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'google');
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', 'notranslate');
+  }, []);
 
   const menuItems: MenuProps['items'] = [
     {
@@ -114,6 +129,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   if (!auth) return null;
 
   return (
+    <div className="notranslate" translate="no">
     <Layout className="min-h-screen" style={{ minHeight: '100vh' }}>
       <Sider
         trigger={null}
@@ -174,6 +190,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         </Content>
       </Layout>
     </Layout>
+    </div>
   );
 };
 

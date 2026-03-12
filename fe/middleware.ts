@@ -7,6 +7,18 @@ const isPublicFile = (pathname: string) => /\.[^/]+$/.test(pathname);
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  const adminPathMatch = pathname.match(/^\/(?:en|id|in)\/(admin|log8i8n738)(?:\/(.*))?$/);
+  if (adminPathMatch) {
+    const normalizedPath = `/${adminPathMatch[1]}${adminPathMatch[2] ? `/${adminPathMatch[2]}` : ''}`;
+    const url = request.nextUrl.clone();
+    url.pathname = normalizedPath;
+    return NextResponse.redirect(url);
+  }
+
+  if (/^\/(admin|log8i8n738)(?:\/|$)/.test(pathname)) {
+    return NextResponse.next();
+  }
+
   // Skip Next.js internals and public files
   if (
     pathname.startsWith('/_next') ||

@@ -103,6 +103,25 @@ export function clearStoredAuth() {
   document.cookie = "ryu_token=; Max-Age=0; path=/; SameSite=Lax";
 }
 
+export async function validateToken(token: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE}/auth/validate-token`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) return false;
+
+    const result = await response.json();
+    return Boolean(result?.success && result?.data?.valid);
+  } catch (error) {
+    console.warn("Token validation request failed", error);
+    return false;
+  }
+}
+
 export async function login(email: string, password: string): Promise<AuthSession> {
   const response = await fetch(`${API_BASE}/auth/login`, {
     method: "POST",

@@ -231,7 +231,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ open, onClose, onSubmit, arti
           </Form.Item>
 
           <Form.Item label={<span>Content <span className="text-red-500">*</span></span>}>
-            <div className="mb-2">
+            <div className="mb-2 notranslate" translate="no">
               <Button 
                 type="primary" 
                 size="large"

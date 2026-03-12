@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useMemo, forwardRef, useImperativeHandle, useCallback } from 'react';
+import React, { useRef, useMemo, forwardRef, useImperativeHandle, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill-new/dist/quill.snow.css';
 
@@ -30,6 +30,15 @@ export interface RichTextEditorRef {
 const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(
   ({ value, onChange, placeholder = 'Write your content here...', onImageButtonClick, onImageUpload, className = '' }, ref) => {
     const quillRef = useRef<any>(null);
+
+    useEffect(() => {
+      const editor = quillRef.current?.getEditor?.();
+      const root = editor?.root as HTMLElement | undefined;
+      if (!root) return;
+
+      root.setAttribute('translate', 'no');
+      root.classList.add('notranslate');
+    }, []);
 
     // Insert image into editor
     const insertImage = useCallback((imageUrl: string) => {
@@ -129,7 +138,7 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(
     ];
 
     return (
-      <div className={`rich-text-editor ${className}`}>
+      <div className={`rich-text-editor notranslate ${className}`} translate="no">
         <ReactQuill
           ref={quillRef}
           theme="snow"
