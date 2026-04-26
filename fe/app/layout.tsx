@@ -1,11 +1,18 @@
 import React from 'react';
 import { Poppins, Anton } from 'next/font/google';
-import { ConfigProvider } from 'antd';
+import type { Metadata } from 'next';
+import { ConfigProvider, App as AntdApp } from 'antd';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import './globals.css';
 import theme from './theme/themeConfig';
-import LayoutWrapper from '@/app/components/LayoutWrapper';
 import ScrollToTop from '@/app/components/ScrollToTop';
+import { LanguageProvider } from '@/app/providers/LanguageProvider';
+
+export const metadata: Metadata = {
+  other: {
+    google: 'notranslate',
+  },
+};
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -20,16 +27,17 @@ const anton = Anton({
 });
 
 const RootLayout = ({ children }: React.PropsWithChildren) => (
-  <html lang="en" className={`${poppins.variable} ${anton.variable}`}>
-    <body>
+  <html lang="en" className={`${poppins.variable} ${anton.variable} notranslate`} translate="no" suppressHydrationWarning>
+    <body className="notranslate" translate="no" suppressHydrationWarning>
       <AntdRegistry>
-        <ConfigProvider theme={theme}>
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
-        </ConfigProvider>
+        <LanguageProvider>
+          <ConfigProvider theme={theme}>
+            <AntdApp>
+              {children}
+            </AntdApp>
+          </ConfigProvider>
+        </LanguageProvider>
       </AntdRegistry>
-      <ScrollToTop />
     </body>
   </html>
 );
