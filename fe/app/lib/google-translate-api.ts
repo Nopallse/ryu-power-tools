@@ -56,9 +56,12 @@ export async function translateText({
     const htmlTags: string[] = [];
 
     if (hasHtml) {
-      // Extract HTML tags dan replace dengan placeholder
-      htmlTags.push(...(text.match(htmlRegex) || []));
-      textToTranslate = text.replace(htmlRegex, `[HTML${htmlTags.length - 1}]`);
+      // Extract HTML tags dan replace dengan placeholder unik per tag
+      textToTranslate = text.replace(htmlRegex, (match) => {
+        const idx = htmlTags.length;
+        htmlTags.push(match);
+        return `[HTML_${idx}]`;
+      });
     }
 
     // MyMemory API endpoint
@@ -86,7 +89,7 @@ export async function translateText({
       // Restore HTML tags
       if (hasHtml) {
         htmlTags.forEach((tag, i) => {
-          translatedText = translatedText.replace(`[HTML${i}]`, tag);
+          translatedText = translatedText.replace(`[HTML_${i}]`, tag);
         });
       }
     } else if (data.responseStatus === 403) {

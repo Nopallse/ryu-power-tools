@@ -18,11 +18,11 @@ export default function BlogDetailPage() {
   const [related, setRelated] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Translate article and related articles
+  // Translate article (only title — HTML content is fragile to translate)
   const { translated: translatedArticle, isLoading: isTranslatingArticle } = useTranslatedData(
     article,
     language,
-    ['title', 'contentHtml']
+    ['title', 'excerpt']
   );
 
   const { translated: translatedRelated, isLoading: isTranslatingRelated } = useTranslatedData(
@@ -76,17 +76,16 @@ export default function BlogDetailPage() {
 
   return (
     <div className="bg-white py-20">
-      <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
-        {article && (
-          <article className="bg-white">
-            <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
-              <img
-                src={getImageUrl(article.primaryImage)}
-                alt={article.title}
-                className="w-full h-auto object-cover"
-              />
-            </div>
-
+      {article && (
+        <article className="bg-white">
+          <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
+            <img
+              src={getImageUrl(article.primaryImage)}
+              alt={article.title}
+              className="w-full h-auto object-cover"
+            />
+          </div>
+          <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
             <header className="mb-8">
               <h1 className="text-3xl sm:text-4xl font-bold text-[#2d5016] mb-4 leading-tight">
                 {isTranslatingArticle ? '...' : translatedArticle?.title || article?.title}
@@ -98,23 +97,27 @@ export default function BlogDetailPage() {
             </header>
 
             <div
-              className="prose prose-lg max-w-none
-                [&_p]:text-gray-700 [&_p]:leading-relaxed [&_p]:text-base [&_p]:break-words
-                [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-[#2d5016] [&_h2]:mb-4 [&_h2]:mt-8 [&_h2]:break-words
-                [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:text-[#2d5016] [&_h3]:mb-4 [&_h3]:mt-8 [&_h3]:break-words
+              className="article-content prose prose-lg max-w-none
+                [&_p]:text-gray-700 [&_p]:leading-relaxed [&_p]:text-base [&_p]:mb-6
+                [&_span]:text-gray-700
+                [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-[#2d5016] [&_h2]:mb-6 [&_h2]:mt-10
+                [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-[#2d5016] [&_h3]:mb-6 [&_h3]:mt-8
                 [&_ul]:list-disc [&_ul]:list-inside [&_ul]:mb-6 [&_ul]:space-y-2
-                [&_li]:text-gray-700 [&_li]:break-words
-                [&_a]:text-[#2d5016] [&_a]:underline [&_a]:break-all
-                [&_figure]:mb-8 [&_figure]:mt-8
-                [&_img]:w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:shadow-md
-                break-words overflow-wrap-anywhere"
-              dangerouslySetInnerHTML={{ __html: isTranslatingArticle ? '<p>Translating...</p>' : (translatedArticle?.contentHtml || article?.contentHtml || '') }}
+                [&_li]:text-gray-700
+                [&_a]:text-[#2d5016] [&_a]:underline
+                [&_figure]:mb-10 [&_figure]:mt-10
+                [&_img]:w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:shadow-md [&_img]:my-6
+                [&_*]:max-w-full
+                break-words"
+              dangerouslySetInnerHTML={{ __html: article?.contentHtml || '' }}
             />
-          </article>
-        )}
+          </div>
+        </article>
+      )}
 
-        {(translatedRelated?.items || related).length > 0 && (
-          <section className="mt-16 pt-8 border-t border-gray-200">
+      {(translatedRelated?.items || related).length > 0 && (
+        <section className="mt-16 pt-8 border-t border-gray-200">
+          <div className="container mx-auto max-w-screen-xl px-8 sm:px-12 lg:px-16">
             <h3 className="text-2xl font-bold text-[#2d5016] mb-6">{t.blog.relatedArticles}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {(translatedRelated?.items || related).map((r: any) => (
@@ -141,9 +144,9 @@ export default function BlogDetailPage() {
                 </Link>
               ))}
             </div>
-          </section>
-        )}
-      </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
