@@ -8,17 +8,17 @@ import dayjs from 'dayjs';
 import { useLanguage } from '@/app/providers/LanguageProvider';
 import { useTranslatedData } from '@/app/hooks/useTranslatedData';
 import type { Article } from '@/app/lib/article-api';
-import { getPublicArticleById, getPublicArticles } from '@/app/lib/article-api';
+import { getPublicArticleBySlug, getPublicArticles } from '@/app/lib/article-api';
+import { forceWrapHtml } from '@/app/lib/forceWrapHtml';
 
 export default function BlogDetailPage() {
   const { t, language } = useLanguage();
   const params = useParams();
-  const id = params.id as string;
+  const slug = params.slug as string;
   const [article, setArticle] = useState<Article | null>(null);
   const [related, setRelated] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Translate article (only title — HTML content is fragile to translate)
   const { translated: translatedArticle, isLoading: isTranslatingArticle } = useTranslatedData(
     article,
     language,
@@ -28,7 +28,7 @@ export default function BlogDetailPage() {
   const { translated: translatedRelated, isLoading: isTranslatingRelated } = useTranslatedData(
     related.length > 0 ? { items: related } : null,
     language,
-    [] // Translate all fields in related articles
+    []
   );
 
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
@@ -41,11 +41,10 @@ export default function BlogDetailPage() {
   useEffect(() => {
     (async () => {
       try {
-        const data = await getPublicArticleById(id);
+        const data = await getPublicArticleBySlug(slug);
         setArticle(data);
-        // fetch related: other published articles excluding current
         const list = await getPublicArticles();
-        const others = list.filter(a => `${a.id}` !== id).slice(0, 3);
+        const others = list.filter((a) => a.slug !== slug).slice(0, 3);
         setRelated(others);
       } catch (e) {
         console.error('Failed to load article', e);
@@ -53,7 +52,7 @@ export default function BlogDetailPage() {
         setLoading(false);
       }
     })();
-  }, [id]);
+  }, [slug]);
 
   const dateText = useMemo(() => {
     if (!article) return '';
@@ -109,7 +108,13 @@ export default function BlogDetailPage() {
                 [&_img]:w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:shadow-md [&_img]:my-6
                 [&_*]:max-w-full
                 break-words"
-              dangerouslySetInnerHTML={{ __html: article?.contentHtml || '' }}
+              dangerouslySetInnerHTML={{ __html: (() => {
+                const raw = article?.contentHtml || '';
+                // convert relative src to absolute
+                const withImages = raw.replace(/src=\"(\/[^\"]+)\"/g, (_m, p1) => `src="${getImageUrl(p1)}"`);
+                return forceWrapHtml(withImages);
+              })() }}
+              style={{ whiteSpace: 'normal', overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto' }}
             />
           </div>
         </article>
@@ -121,7 +126,7 @@ export default function BlogDetailPage() {
             <h3 className="text-2xl font-bold text-[#2d5016] mb-6">{t.blog.relatedArticles}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {(translatedRelated?.items || related).map((r: any) => (
-                <Link href={`/${language}/blog/${r.id}`} key={r.id}>
+                <Link href={`/${language}/blog/${r.slug}`} key={r.slug || r.id}>
                   <div className="flex flex-col h-full group cursor-pointer bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                     <div className="overflow-hidden">
                       <img
