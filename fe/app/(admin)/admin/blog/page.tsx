@@ -6,6 +6,7 @@ import {
   Button,
   Space,
   Input,
+  Select,
   Tag,
   Popconfirm,
   Card,
@@ -23,7 +24,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useAuthGuard } from '@/app/hooks/useAuthGuard';
 import { useUnauthorizedHandler } from '@/app/hooks/useUnauthorizedHandler';
 import {
-  getArticles,
+  getAdminArticles,
   createArticle,
   updateArticle,
   deleteArticle,
@@ -31,6 +32,21 @@ import {
 } from '@/app/lib/article-api';
 import dayjs from 'dayjs';
 import ArticleForm from '@/app/components/ArticleForm';
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  if (typeof error === 'object' && error !== null) {
+    const maybeMessage = 'message' in error ? (error as { message?: unknown }).message : undefined;
+    if (typeof maybeMessage === 'string' && maybeMessage) {
+      return maybeMessage;
+    }
+  }
+
+  return fallback;
+};
 
 const BlogPage = () => {
   const { auth, ready } = useAuthGuard();
@@ -41,6 +57,7 @@ const BlogPage = () => {
   const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PUBLISHED' | 'DRAFT' | 'ARCHIVED'>('ALL');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -48,7 +65,7 @@ const BlogPage = () => {
   useEffect(() => {
     if (!ready || !auth) return;
     loadArticles();
-  }, [ready, auth]);
+  }, [ready, auth, statusFilter]);
 
   useEffect(() => {
     const filtered = articles.filter((article) =>
@@ -60,14 +77,14 @@ const BlogPage = () => {
   const loadArticles = async () => {
     setLoading(true);
     try {
-      const data = await getArticles(auth!.token);
+      const data = await getAdminArticles(auth!.token, statusFilter);
       const list = Array.isArray(data) ? data : [];
       setArticles(list);
       setFilteredArticles(list);
     } catch (error) {
       const wasUnauth = await handleError(error);
       if (!wasUnauth) {
-        message.error('Failed to load articles');
+        message.error(getErrorMessage(error, 'Failed to load articles'));
       }
       console.error(error);
     } finally {
@@ -110,7 +127,12 @@ const BlogPage = () => {
     } catch (error) {
       const wasUnauth = await handleError(error);
       if (!wasUnauth) {
-        message.error(editingArticle ? 'Failed to update article' : 'Failed to create article');
+        message.error(
+          getErrorMessage(
+            error,
+            editingArticle ? 'Failed to update article' : 'Failed to create article'
+          )
+        );
       }
       console.error(error);
       throw error;
@@ -127,7 +149,7 @@ const BlogPage = () => {
     } catch (error) {
       const wasUnauth = await handleError(error);
       if (!wasUnauth) {
-        message.error('Failed to delete article');
+        message.error(getErrorMessage(error, 'Failed to delete article'));
       }
       console.error(error);
     }
@@ -211,7 +233,7 @@ const BlogPage = () => {
       </div>
 
       <Card variant="borderless" className="shadow-sm">
-        <div className="mb-4">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <Input
             placeholder="Search articles..."
             prefix={<SearchOutlined />}
@@ -219,6 +241,19 @@ const BlogPage = () => {
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             className="max-w-md"
+          />
+
+          <Select
+            size="large"
+            value={statusFilter}
+            onChange={(value) => setStatusFilter(value)}
+            className="w-full md:w-56"
+            options={[
+              { value: 'ALL', label: 'All Status' },
+              { value: 'PUBLISHED', label: 'Published' },
+              { value: 'DRAFT', label: 'Draft' },
+              { value: 'ARCHIVED', label: 'Archived' },
+            ]}
           />
         </div>
 
