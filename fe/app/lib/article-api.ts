@@ -25,13 +25,16 @@ export type ImageArticle = {
   createdAt: string;
 };
 
-export async function getArticles(token: string): Promise<Article[]> {
+export async function getAdminArticles(
+  token: string,
+  status: 'PUBLISHED' | 'DRAFT' | 'ARCHIVED' | 'ALL' = 'ALL'
+): Promise<Article[]> {
   if (!token) {
-    console.error('ERROR: No token provided to getArticles');
+    console.error('ERROR: No token provided to getAdminArticles');
     throw new Error("Authentication token is missing");
   }
 
-  const response = await fetch(`${API_BASE}/article`, {
+  const response = await fetch(`${API_BASE}/article/admin?status=${encodeURIComponent(status)}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -43,6 +46,10 @@ export async function getArticles(token: string): Promise<Article[]> {
 
   const result = await response.json();
   return result.data || result;
+}
+
+export async function getArticles(token: string): Promise<Article[]> {
+  return getAdminArticles(token);
 }
 
 export async function getArticleById(id: string, token: string): Promise<Article> {

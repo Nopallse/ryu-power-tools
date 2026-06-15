@@ -17,7 +17,7 @@ import { useAuthGuard } from '@/app/hooks/useAuthGuard';
 import { useUnauthorizedHandler } from '@/app/hooks/useUnauthorizedHandler';
 import { getProducts, type Product } from '@/app/lib/product-api';
 import { getCategories, type Category } from '@/app/lib/category-api';
-import { getArticles, type Article } from '@/app/lib/article-api';
+import { getAdminArticles, type Article } from '@/app/lib/article-api';
 import { getCatalogues, type Catalogue } from '@/app/lib/catalogue-api';
 import { getServiceCenters, type ServiceCenter } from '@/app/lib/service-center-api';
 import { App } from 'antd';
@@ -69,7 +69,7 @@ const DashboardPage = () => {
       const [products, categories, articles, catalogues, serviceCenters] = await Promise.all([
         getProducts(auth!.token),
         getCategories(auth!.token),
-        getArticles(auth!.token),
+        getAdminArticles(auth!.token, 'ALL'),
         getCatalogues(auth!.token),
         getServiceCenters(auth!.token),
       ]);
