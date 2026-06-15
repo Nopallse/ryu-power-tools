@@ -19,10 +19,6 @@ export default function BlogDetailPage() {
   const [related, setRelated] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
-<<<<<<< HEAD:fe/app/[lang]/blog/[slug]/page.tsx
-=======
-  // Translate article (only title — HTML content is fragile to translate)
->>>>>>> 1e1a885d683c00eae1f8ae5e9dea81a034228306:fe/app/[lang]/blog/[id]/page.tsx
   const { translated: translatedArticle, isLoading: isTranslatingArticle } = useTranslatedData(
     article,
     language,
@@ -112,7 +108,6 @@ export default function BlogDetailPage() {
                 [&_img]:w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:shadow-md [&_img]:my-6
                 [&_*]:max-w-full
                 break-words"
-<<<<<<< HEAD:fe/app/[lang]/blog/[slug]/page.tsx
               dangerouslySetInnerHTML={{ __html: (() => {
                 const raw = article?.contentHtml || '';
                 // convert relative src to absolute
@@ -120,9 +115,6 @@ export default function BlogDetailPage() {
                 return forceWrapHtml(withImages);
               })() }}
               style={{ whiteSpace: 'normal', overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto' }}
-=======
-              dangerouslySetInnerHTML={{ __html: article?.contentHtml || '' }}
->>>>>>> 1e1a885d683c00eae1f8ae5e9dea81a034228306:fe/app/[lang]/blog/[id]/page.tsx
             />
           </div>
         </article>
