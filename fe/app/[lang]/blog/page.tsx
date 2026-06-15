@@ -70,7 +70,7 @@ export default function BlogPage() {
           {(translatedArticles?.items || articles).length ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {(translatedArticles?.items || articles).map((article: any) => (
-                <Link href={`/${language}/blog/${article.id}`} key={article.id}>
+                <Link href={`/${language}/blog/${article.slug}`} key={article.slug || article.id}>
                   <div className="flex flex-col h-full group cursor-pointer bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                     <div className="overflow-hidden">
                       <img
