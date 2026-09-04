@@ -1,11 +1,26 @@
 "use client";
 
 import React from "react";
-import {  Row, Col } from "antd";
+import { Row, Col, Carousel } from "antd";
 import { useLanguage } from "@/app/providers/LanguageProvider";
 
 export default function HeroSection() {
   const { t, language } = useLanguage();
+
+  const heroImages = [
+    {
+      src: "/images/ryu-tools-stack.webp",
+      alt: "Ryu Power Tools Collection",
+    },
+    {
+      src: "/images/feature_product.webp",
+      alt: "Feature Product",
+    },
+    {
+      src: "/images/engine.webp",
+      alt: "Engine Product",
+    },
+  ];
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-white flex items-stretch">
@@ -30,12 +45,21 @@ export default function HeroSection() {
           </div>
         </Col>
         <Col xs={24} lg={12} className="h-full">
-          <div className="w-full h-full">
-            <img
-              src="/images/ryu-tools-stack.webp"
-              alt="Ryu Power Tools Collection"
-              className="w-full h-full object-cover block"
-            />
+          <div className="w-full h-full overflow-hidden">
+            <Carousel autoplay effect="fade">
+              {heroImages.map((image, index) => (
+                <div
+                  key={index}
+                  className="h-[400px] lg:h-[calc(100vh-64px)] w-full"
+                >
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    className="w-full h-full object-cover block"
+                  />
+                </div>
+              ))}
+            </Carousel>
           </div>
         </Col>
       </Row>
