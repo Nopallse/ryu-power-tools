@@ -1,7 +1,7 @@
 const id = {
   // Navigation
   nav: {
-    home: 'Berandaaaa',
+    home: 'Beranda',
     blog: 'Blog',
     category: 'Kategori',
     viewCatalog: 'Lihat Katalog',

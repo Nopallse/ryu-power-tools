@@ -292,7 +292,7 @@ const Navbar: React.FC = () => {
         {/* Logo */}
         <Link href="/" className="flex items-center h-12 flex-1 lg:flex-none justify-center lg:justify-start">
           <Image
-            src="/images/logo.png"
+            src="/images/logoNew.png"
             alt="Ryu Power Tools"
             width={140}
             height={48}
@@ -390,7 +390,7 @@ const Navbar: React.FC = () => {
         title={
           <div className="flex items-center justify-start">
             <Image
-              src="/images/logo.png"
+              src="/images/logoNew.png"
               alt="Ryu Power Tools"
               width={100}
               height={36}
